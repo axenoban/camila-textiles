@@ -1,9 +1,3 @@
-<?php
-require_once __DIR__ . '/../../models/empleado.php';
-
-$empleadoModel = new Empleado();
-$empleados = $empleadoModel->obtenerEmpleados();
-?>
 <!-- views/admin/empleados.php -->
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
@@ -35,8 +29,8 @@ $empleados = $empleadoModel->obtenerEmpleados();
                         <?php foreach ($empleados as $empleado): ?>
                             <tr>
                                 <td><?= $empleado['id'] ?></td>
-                                <td><?= htmlspecialchars($empleado['nombre'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?= htmlspecialchars($empleado['puesto'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?= $empleado['nombre'] ?></td>
+                                <td><?= $empleado['puesto'] ?></td>
                                 <td><?= '$' . number_format($empleado['salario'], 2) ?></td>
                                 <td class="text-end text-nowrap">
                                     <a href="editar_empleado.php?id=<?= $empleado['id'] ?>" class="btn btn-warning btn-sm me-2">Editar</a>

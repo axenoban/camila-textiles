@@ -1,7 +1,7 @@
 <?php
 // pedidos.php
 
-require_once 'models/pedido.php';
+require_once __DIR__ . '/../models/pedido.php';
 
 class PedidosController {
 

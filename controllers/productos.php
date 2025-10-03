@@ -1,7 +1,7 @@
 <?php
 // productos.php
 
-require_once 'models/producto.php';
+require_once __DIR__ . '/../models/producto.php';
 
 class ProductosController {
 

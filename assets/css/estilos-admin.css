@@ -1,0 +1,71 @@
+/* estilos-admin.css */
+
+/* Estilos generales para el panel */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f1f1f1;
+}
+
+.navbar {
+    background-color: #343a40;
+    padding: 15px;
+}
+
+.navbar-brand, .navbar-nav li a {
+    color: #ffffff;
+}
+
+.container {
+    margin-top: 40px;
+}
+
+/* Sidebar del administrador */
+.sidebar {
+    background-color: #343a40;
+    color: #fff;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+}
+
+.sidebar a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    margin: 15px 0;
+    padding: 10px;
+}
+
+.sidebar a:hover {
+    background-color: #007bff;
+}
+
+.main-content {
+    margin-left: 270px;
+    padding: 20px;
+}
+
+.dashboard {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Botones */
+.btn {
+    margin: 5px 0;
+    font-size: 1rem;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}

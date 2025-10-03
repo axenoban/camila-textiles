@@ -1,0 +1,64 @@
+/* estilos-cliente.css */
+
+/* Estilos del panel */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7f6;
+}
+
+.navbar {
+    background-color: #007bff;
+    padding: 15px;
+}
+
+.navbar-brand, .navbar-nav li a {
+    color: #fff;
+}
+
+.container {
+    margin-top: 30px;
+}
+
+.dashboard {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Tabla de pedidos */
+.table {
+    width: 100%;
+    margin-top: 30px;
+}
+
+.table th, .table td {
+    text-align: center;
+    padding: 12px;
+    border: 1px solid #ddd;
+}
+
+.table th {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Botones */
+.btn {
+    margin: 5px 0;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}

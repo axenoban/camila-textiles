@@ -1,3 +1,9 @@
+<?php
+require_once __DIR__ . '/../../models/producto.php';
+
+$productoModel = new Producto();
+$productos = $productoModel->obtenerProductosVisibles();
+?>
 <!-- views/public/productos.php -->
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
@@ -33,6 +39,32 @@
                         </div>
                     </article>
                 <?php endforeach; ?>
+            </div>
+            <div class="product-grid">
+                <?php if (!empty($productos)): ?>
+                    <?php foreach ($productos as $producto): ?>
+                        <article class="product-card">
+                            <img src="<?= htmlspecialchars($producto['imagen'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8'); ?>">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="card-title mb-0"><?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8'); ?></h5>
+                                    <span class="product-price">$<?= number_format($producto['precio'], 2) ?></span>
+                                </div>
+                                <p class="card-text mb-4"><?= htmlspecialchars($producto['descripcion'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge-soft">Stock garantizado</span>
+                                    <a href="<?= BASE_URL ?>/views/cliente/productos.php" class="btn btn-primary">Reservar</a>
+                                </div>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="bi bi-emoji-neutral"></i></div>
+                        <h5 class="fw-semibold">Aún no se han cargado productos</h5>
+                        <p class="text-muted mb-0">Utiliza el panel administrativo para publicar nuevas telas y se reflejarán en segundos.</p>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </section>

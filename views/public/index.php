@@ -1,3 +1,9 @@
+<?php
+require_once __DIR__ . '/../../models/producto.php';
+
+$productoModel = new Producto();
+$productos = $productoModel->obtenerProductosDestacados(6);
+?>
 <!-- views/public/index.php -->
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>

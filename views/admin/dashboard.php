@@ -1,3 +1,11 @@
+<?php
+require_once __DIR__ . '/../../models/reporte.php';
+
+$reporteModel = new Reporte();
+$metricas = $reporteModel->obtenerMetricasGenerales();
+$pedidosRecientes = $reporteModel->obtenerPedidosRecientes(5);
+$alertasStock = $reporteModel->obtenerProductosConBajoStock();
+?>
 <!-- views/admin/dashboard.php -->
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>

@@ -1,7 +1,7 @@
 <?php
 // inventario.php
 
-require_once 'models/inventario.php';
+require_once __DIR__ . '/../models/inventario.php';
 
 class InventarioController {
 

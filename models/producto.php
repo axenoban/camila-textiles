@@ -1,7 +1,7 @@
 <?php
 // producto.php
 
-require_once 'conexion.php';
+require_once __DIR__ . '/../database/conexion.php';
 
 class Producto {
 
@@ -12,6 +12,32 @@ class Producto {
         $stmt = $pdo->prepare("SELECT * FROM productos WHERE visible = 1");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Método para obtener todos los productos sin filtro de visibilidad
+    public function obtenerTodosLosProductos() {
+        global $pdo;
+
+        $stmt = $pdo->prepare("SELECT * FROM productos ORDER BY fecha_creacion DESC");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Método para obtener productos recientes para destacar en portada
+    public function obtenerProductosDestacados($limite = 6) {
+        global $pdo;
+
+        $stmt = $pdo->prepare("SELECT * FROM productos WHERE visible = 1 ORDER BY fecha_creacion DESC LIMIT :limite");
+        $stmt->bindValue(':limite', (int) $limite, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Método para contar los productos visibles en el catálogo
+    public function contarProductosVisibles() {
+        global $pdo;
+
+        return (int) $pdo->query("SELECT COUNT(*) FROM productos WHERE visible = 1")->fetchColumn();
     }
 
     // Método para obtener un producto por ID

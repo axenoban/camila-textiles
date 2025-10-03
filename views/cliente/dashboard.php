@@ -1,3 +1,25 @@
+<?php
+require_once __DIR__ . '/../../models/pedido.php';
+require_once __DIR__ . '/../../models/producto.php';
+
+$pedidoModel = new Pedido();
+$productoModel = new Producto();
+
+$pedidosCliente = $pedidoModel->obtenerPedidosPorCliente($clienteActual['id']);
+$pedidosActivos = array_filter($pedidosCliente, function ($pedido) {
+    return in_array($pedido['estado'], ['pendiente', 'confirmado']);
+});
+$pedidosCompletados = array_filter($pedidosCliente, function ($pedido) {
+    return $pedido['estado'] === 'completado';
+});
+$totalPedidos = count($pedidosCliente);
+$productosDisponibles = $productoModel->contarProductosVisibles();
+$totalGasto = array_reduce($pedidosCliente, function ($carry, $pedido) {
+    return $carry + ($pedido['precio'] * $pedido['cantidad']);
+}, 0);
+$pedidosRecientes = array_slice($pedidosCliente, 0, 3);
+$ultimoPedido = $pedidosCliente[0] ?? null;
+?>
 <!-- views/cliente/dashboard.php -->
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
@@ -34,6 +56,39 @@
                 </div>
             </div>
         </div>
+        <?php if (!empty($pedidosRecientes)): ?>
+            <div class="client-section">
+                <h2 class="h5 fw-semibold mb-3">Actividad reciente</h2>
+                <div class="portal-table">
+                    <div class="table-responsive">
+                        <table class="table table-modern align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($pedidosRecientes as $pedido): ?>
+                                    <tr>
+                                        <td><?= date('d/m/Y', strtotime($pedido['fecha_creacion'])); ?></td>
+                                        <td><?= htmlspecialchars($pedido['producto'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td><?= $pedido['cantidad']; ?></td>
+                                        <td>
+                                            <span class="status-pill status-<?= htmlspecialchars($pedido['estado'], ENT_QUOTES, 'UTF-8'); ?>">
+                                                <?= htmlspecialchars(ucfirst($pedido['estado']), ENT_QUOTES, 'UTF-8'); ?>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 </main>
 

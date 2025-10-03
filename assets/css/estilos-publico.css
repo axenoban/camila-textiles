@@ -175,6 +175,163 @@ a:hover {
     font-weight: 600;
     margin-bottom: 16px;
     text-align: center;
+    background: var(--surface);
+    border-radius: var(--border-radius-lg);
+    padding: 48px;
+    box-shadow: var(--shadow-soft);
+}
+
+.empty-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 16px;
+}
+
+.about-section {
+    padding-top: 140px;
+}
+
+.about-card {
+    background-color: var(--surface);
+    border-radius: 22px;
+    box-shadow: var(--shadow-soft);
+    padding: 40px;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 32px;
+    margin-top: 32px;
+}
+
+.timeline::before {
+    content: "";
+    position: absolute;
+    left: 12px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, rgba(27, 91, 247, 0.15), rgba(249, 115, 22, 0.15));
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 28px;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -22px;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+}
+
+.timeline-item h5 {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.contact-section {
+    padding-top: 140px;
+}
+
+.contact-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 32px;
+}
+
+.contact-card,
+.form-card {
+    background-color: var(--surface);
+    border-radius: 22px;
+    box-shadow: var(--shadow-soft);
+    padding: 32px;
+    height: 100%;
+}
+
+.contact-card li {
+    list-style: none;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.contact-card i {
+    color: var(--primary);
+    margin-right: 12px;
+}
+
+.form-control,
+.form-select,
+textarea.form-control {
+    border-radius: 14px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    padding: 12px 16px;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea.form-control:focus {
+    border-color: rgba(27, 91, 247, 0.45);
+    box-shadow: 0 0 0 3px rgba(27, 91, 247, 0.12);
+}
+
+.branch-card {
+    background-color: var(--surface);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: var(--shadow-soft);
+    height: 100%;
+}
+
+.branch-card h5 {
+    font-weight: 600;
+}
+
+.site-footer {
+    background: #0f172a;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.footer-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.footer-text {
+    color: rgba(255, 255, 255, 0.65);
+    margin-bottom: 0;
+}
+
+.footer-heading {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+    margin-bottom: 16px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.auth-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 120px 0 80px;
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.08), transparent 40%);
 }
 
 .section-lead {

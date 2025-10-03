@@ -1,7 +1,7 @@
 <?php
 // empleados.php
 
-require_once 'models/empleado.php';
+require_once __DIR__ . '/../models/empleado.php';
 
 class EmpleadosController {
 

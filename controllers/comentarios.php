@@ -1,7 +1,7 @@
 <?php
 // comentarios.php
 
-require_once 'models/comentario.php';
+require_once __DIR__ . '/../models/comentario.php';
 
 class ComentariosController {
 

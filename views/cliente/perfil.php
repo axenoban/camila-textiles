@@ -1,3 +1,10 @@
+<?php
+include('includes/header.php');
+require_once __DIR__ . '/../../models/usuario.php';
+
+$usuarioModel = new Usuario();
+$usuario = $usuarioModel->obtenerUsuarioPorId($clienteActual['id']) ?? $clienteActual;
+?>
 <!-- views/cliente/perfil.php -->
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>

@@ -1,9 +1,3 @@
-<?php
-require_once __DIR__ . '/../../models/inventario.php';
-
-$inventarioModel = new Inventario();
-$inventario = $inventarioModel->obtenerInventario();
-?>
 <!-- views/admin/inventario.php -->
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
@@ -21,21 +15,14 @@ $inventario = $inventarioModel->obtenerInventario();
                         <tr>
                             <th>Producto</th>
                             <th>Cantidad disponible</th>
-                            <th>Estado</th>
                             <th class="text-end">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($inventario as $item): ?>
                             <tr>
-                                <td><?= htmlspecialchars($item['nombre'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?= $item['nombre'] ?></td>
                                 <td><?= $item['cantidad'] ?></td>
-                                <td>
-                                    <?php $estadoStock = $item['cantidad'] <= 20 ? 'status-cancelado' : ($item['cantidad'] <= 60 ? 'status-pendiente' : 'status-completado'); ?>
-                                    <span class="status-pill <?= $estadoStock; ?>">
-                                        <?= $item['cantidad'] <= 20 ? 'Crítico' : ($item['cantidad'] <= 60 ? 'Bajo' : 'Saludable'); ?>
-                                    </span>
-                                </td>
                                 <td class="text-end text-nowrap">
                                     <a href="agregar_inventario.php?id=<?= $item['id_producto'] ?>" class="btn btn-info btn-sm me-2">Ajustar stock</a>
                                     <a href="eliminar_inventario.php?id=<?= $item['id_producto'] ?>" class="btn btn-danger btn-sm">Reducir</a>

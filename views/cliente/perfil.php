@@ -6,6 +6,7 @@ $usuarioModel = new Usuario();
 $usuario = $usuarioModel->obtenerUsuarioPorId($clienteActual['id']) ?? $clienteActual;
 ?>
 <!-- views/cliente/perfil.php -->
+<?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
 
 <main class="main-area">
@@ -20,11 +21,11 @@ $usuario = $usuarioModel->obtenerUsuarioPorId($clienteActual['id']) ?? $clienteA
                     <form action="actualizar_perfil.php" method="POST" class="row g-4">
                         <div class="col-12">
                             <label for="nombre" class="form-label">Nombre completo</label>
-                            <input type="text" class="form-control" id="nombre" name="nombre" value="<?= htmlspecialchars($usuario['nombre'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+                            <input type="text" class="form-control" id="nombre" name="nombre" value="<?= $usuario['nombre'] ?>" required>
                         </div>
                         <div class="col-12">
                             <label for="email" class="form-label">Correo electrónico</label>
-                            <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($usuario['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+                            <input type="email" class="form-control" id="email" name="email" value="<?= $usuario['email'] ?>" required>
                         </div>
                         <div class="col-12">
                             <label for="clave" class="form-label">Nueva contraseña</label>

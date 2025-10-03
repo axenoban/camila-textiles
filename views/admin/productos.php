@@ -1,9 +1,3 @@
-<?php
-require_once __DIR__ . '/../../models/producto.php';
-
-$productoModel = new Producto();
-$productos = $productoModel->obtenerTodosLosProductos();
-?>
 <!-- views/admin/productos.php -->
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
@@ -28,7 +22,6 @@ $productos = $productoModel->obtenerTodosLosProductos();
                             <th>Nombre</th>
                             <th>Descripción</th>
                             <th>Precio</th>
-                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -36,14 +29,9 @@ $productos = $productoModel->obtenerTodosLosProductos();
                         <?php foreach ($productos as $producto): ?>
                             <tr>
                                 <td><?= $producto['id'] ?></td>
-                                <td><?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?= htmlspecialchars($producto['descripcion'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?= $producto['nombre'] ?></td>
+                                <td><?= $producto['descripcion'] ?></td>
                                 <td><?= '$' . number_format($producto['precio'], 2) ?></td>
-                                <td>
-                                    <span class="status-pill <?= $producto['visible'] ? 'status-completado' : 'status-cancelado'; ?>">
-                                        <?= $producto['visible'] ? 'Publicado' : 'Oculto'; ?>
-                                    </span>
-                                </td>
                                 <td class="text-nowrap">
                                     <a href="editar_producto.php?id=<?= $producto['id'] ?>" class="btn btn-warning btn-sm">Editar</a>
                                     <a href="eliminar_producto.php?id=<?= $producto['id'] ?>" class="btn btn-danger btn-sm">Eliminar</a>

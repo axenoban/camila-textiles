@@ -1,9 +1,3 @@
-<?php
-require_once __DIR__ . '/../../models/comentario.php';
-
-$comentarioModel = new Comentario();
-$comentarios = $comentarioModel->obtenerComentarios();
-?>
 <!-- views/admin/comentarios.php -->
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
@@ -28,9 +22,9 @@ $comentarios = $comentarioModel->obtenerComentarios();
                     <tbody>
                         <?php foreach ($comentarios as $comentario): ?>
                             <tr>
-                                <td><?= htmlspecialchars($comentario['producto'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?= htmlspecialchars($comentario['usuario'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?= htmlspecialchars($comentario['comentario'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?= $comentario['producto'] ?></td>
+                                <td><?= $comentario['usuario'] ?></td>
+                                <td><?= $comentario['comentario'] ?></td>
                                 <td class="text-end text-nowrap">
                                     <a href="eliminar_comentario.php?id=<?= $comentario['id'] ?>" class="btn btn-danger btn-sm">Eliminar</a>
                                 </td>

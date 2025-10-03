@@ -1,18 +1,5 @@
-<?php
-include('includes/header.php');
-require_once __DIR__ . '/../../models/pedido.php';
-
-$pedidoModel = new Pedido();
-$clienteId = $clienteActual['id'] ?? null;
-$pedidosCliente = $clienteId ? $pedidoModel->obtenerPedidosPorCliente($clienteId) : [];
-$pedidosActivos = array_values(array_filter($pedidosCliente, function ($pedido) {
-    return in_array($pedido['estado'], ['pendiente', 'confirmado']);
-}));
-$pedidosHistoricos = array_values(array_filter($pedidosCliente, function ($pedido) {
-    return in_array($pedido['estado'], ['completado', 'cancelado']);
-}));
-?>
 <!-- views/cliente/pedidos.php -->
+<?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
 
 <main class="main-area">
@@ -36,25 +23,17 @@ $pedidosHistoricos = array_values(array_filter($pedidosCliente, function ($pedid
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if (!empty($pedidosActivos)): ?>
-                                <?php foreach ($pedidosActivos as $pedido): ?>
-                                    <tr>
-                                        <td>#<?= $pedido['id'] ?></td>
-                                        <td><?= htmlspecialchars($pedido['producto'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                        <td><?= $pedido['cantidad'] ?></td>
-                                        <td>
-                                            <span class="status-pill status-<?= htmlspecialchars($pedido['estado'], ENT_QUOTES, 'UTF-8'); ?>"><?= htmlspecialchars(ucfirst($pedido['estado']), ENT_QUOTES, 'UTF-8'); ?></span>
-                                        </td>
-                                        <td class="text-end text-nowrap">
-                                            <a href="ver_detalles_pedido.php?id=<?= $pedido['id'] ?>" class="btn btn-info btn-sm">Ver detalles</a>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php else: ?>
+                            <?php foreach ($pedidosActivos as $pedido): ?>
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-4">No tienes pedidos activos por el momento.</td>
+                                    <td><?= $pedido['id'] ?></td>
+                                    <td><?= $pedido['producto'] ?></td>
+                                    <td><?= $pedido['cantidad'] ?></td>
+                                    <td><?= $pedido['estado'] ?></td>
+                                    <td class="text-end text-nowrap">
+                                        <a href="ver_detalles_pedido.php?id=<?= $pedido['id'] ?>" class="btn btn-info btn-sm">Ver detalles</a>
+                                    </td>
                                 </tr>
-                            <?php endif; ?>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -75,23 +54,15 @@ $pedidosHistoricos = array_values(array_filter($pedidosCliente, function ($pedid
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if (!empty($pedidosHistoricos)): ?>
-                                <?php foreach ($pedidosHistoricos as $pedido): ?>
-                                    <tr>
-                                        <td>#<?= $pedido['id'] ?></td>
-                                        <td><?= htmlspecialchars($pedido['producto'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                        <td><?= $pedido['cantidad'] ?></td>
-                                        <td>
-                                            <span class="status-pill status-<?= htmlspecialchars($pedido['estado'], ENT_QUOTES, 'UTF-8'); ?>"><?= htmlspecialchars(ucfirst($pedido['estado']), ENT_QUOTES, 'UTF-8'); ?></span>
-                                        </td>
-                                        <td><?= date('d/m/Y', strtotime($pedido['fecha_creacion'])); ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php else: ?>
+                            <?php foreach ($pedidosHistoricos as $pedido): ?>
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-4">Aún no registras pedidos finalizados.</td>
+                                    <td><?= $pedido['id'] ?></td>
+                                    <td><?= $pedido['producto'] ?></td>
+                                    <td><?= $pedido['cantidad'] ?></td>
+                                    <td><?= $pedido['estado'] ?></td>
+                                    <td><?= $pedido['fecha'] ?></td>
                                 </tr>
-                            <?php endif; ?>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>

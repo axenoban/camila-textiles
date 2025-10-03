@@ -1,9 +1,3 @@
-<?php
-require_once __DIR__ . '/../../models/sucursal.php';
-
-$sucursalModel = new Sucursal();
-$sucursales = $sucursalModel->obtenerSucursales();
-?>
 <!-- views/admin/sucursales.php -->
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
@@ -36,10 +30,10 @@ $sucursales = $sucursalModel->obtenerSucursales();
                         <?php foreach ($sucursales as $sucursal): ?>
                             <tr>
                                 <td><?= $sucursal['id'] ?></td>
-                                <td><?= htmlspecialchars($sucursal['nombre'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?= htmlspecialchars($sucursal['direccion'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?= htmlspecialchars($sucursal['telefono'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?= htmlspecialchars($sucursal['horario_apertura'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?= $sucursal['nombre'] ?></td>
+                                <td><?= $sucursal['direccion'] ?></td>
+                                <td><?= $sucursal['telefono'] ?></td>
+                                <td><?= $sucursal['horario_apertura'] ?></td>
                                 <td class="text-end text-nowrap">
                                     <a href="editar_sucursal.php?id=<?= $sucursal['id'] ?>" class="btn btn-warning btn-sm me-2">Editar</a>
                                     <a href="eliminar_sucursal.php?id=<?= $sucursal['id'] ?>" class="btn btn-danger btn-sm">Eliminar</a>

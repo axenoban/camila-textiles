@@ -153,15 +153,14 @@ $datosVariantes = [
                 <p class="section-subtitle mb-0">Gestiona tu reserva escogiendo color, formato y volumen en un solo lugar.</p>
             </div>
             <div class="text-lg-end">
-                <span class="badge bg-light text-primary fw-semibold">Precio desde Bs <?= number_format((float) ($producto['precio_desde'] ?? $producto['precio']), 2); ?></span>
+                <span class="badge bg-light text-primary fw-semibold">Precio desde $<?= number_format((float) ($producto['precio_desde'] ?? $producto['precio']), 2); ?></span>
                 <div class="small text-muted">Stock equivalente: <?= (int) ($producto['stock_total'] ?? $producto['stock'] ?? 0); ?> metros</div>
             </div>
         </div>
 
         <?php if ($mensajeReserva): ?>
-            <div class="alert alert-<?= $tipoReserva === 'success' ? 'success' : 'danger'; ?> alert-dismissible fade show" role="alert" data-auto-dismiss="true">
+            <div class="alert alert-<?= $tipoReserva === 'success' ? 'success' : 'danger'; ?>" role="alert">
                 <?= htmlspecialchars($mensajeReserva, ENT_QUOTES, 'UTF-8'); ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
             </div>
         <?php endif; ?>
 
@@ -248,7 +247,7 @@ $datosVariantes = [
                                         <div class="col-sm-6">
                                             <label class="option-card <?= $activo ? 'active' : ''; ?>" data-presentacion-id="<?= (int) $presentacion['id']; ?>" data-tipo="<?= htmlspecialchars($presentacion['tipo'], ENT_QUOTES, 'UTF-8'); ?>" data-precio="<?= number_format((float) $presentacion['precio'], 2, '.', ''); ?>" data-metros="<?= number_format((float) ($presentacion['metros_por_unidad'] ?? 0), 2, '.', ''); ?>">
                                                 <strong class="d-block text-capitalize mb-1"><?= htmlspecialchars($presentacion['tipo'], ENT_QUOTES, 'UTF-8'); ?></strong>
-                                                <span class="d-block text-muted small">Bs <?= number_format((float) $presentacion['precio'], 2); ?> <?= $presentacion['tipo'] === 'rollo' ? 'por rollo' : 'por metro'; ?></span>
+                                                <span class="d-block text-muted small">$<?= number_format((float) $presentacion['precio'], 2); ?> <?= $presentacion['tipo'] === 'rollo' ? 'por rollo' : 'por metro'; ?></span>
                                                 <?php if ($presentacion['tipo'] === 'rollo'): ?>
                                                     <span class="badge-soft mt-2">≈ <?= number_format((float) ($presentacion['metros_por_unidad'] ?? 0), 0); ?> metros útiles</span>
                                                 <?php endif; ?>
@@ -264,7 +263,7 @@ $datosVariantes = [
                             <h5 class="fw-semibold mb-3">Cantidad</h5>
                             <div class="input-group">
                                 <label class="input-group-text" for="cantidad">Unidades</label>
-                                <input type="number" class="form-control" id="cantidad" name="cantidad" min="0.5" step="0.5" value="1" required>
+                                <input type="number" class="form-control" id="cantidad" name="cantidad" min="1" value="1" required>
                             </div>
                             <div class="form-text" id="ayuda-disponibilidad"></div>
                         </div>
@@ -272,11 +271,11 @@ $datosVariantes = [
                             <div class="summary-card mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <span class="text-muted">Precio unitario</span>
-                                    <strong id="precio-unitario">Bs 0.00</strong>
+                                    <strong id="precio-unitario">$0.00</strong>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="text-muted">Subtotal estimado</span>
-                                    <strong id="total-resumen">Bs 0.00</strong>
+                                    <strong id="total-resumen">$0.00</strong>
                                 </div>
                                 <div class="small text-muted mt-2" id="equivalencia-texto"></div>
                             </div>
@@ -327,8 +326,7 @@ $datosVariantes = [
     const ayudaDisponibilidad = document.getElementById('ayuda-disponibilidad');
     const botonReservar = document.getElementById('btn-reservar');
 
-    const formatoMoneda = new Intl.NumberFormat('es-BO', { style: 'currency', currency: 'BOB' });
-    const formatoCantidad = new Intl.NumberFormat('es-BO', { maximumFractionDigits: 2, minimumFractionDigits: 0 });
+    const formatoMoneda = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' });
 
     function obtenerDetalleSeleccion(colorId, presentacionId) {
         if (!dataVariantes.matriz[colorId] || !dataVariantes.matriz[colorId][presentacionId]) {
@@ -349,54 +347,27 @@ $datosVariantes = [
         const detalle = obtenerDetalleSeleccion(colorId, presentacionId);
 
         if (!detalle) {
-            precioUnitario.textContent = 'Bs 0.00';
-            totalResumen.textContent = 'Bs 0.00';
+            precioUnitario.textContent = '$0.00';
+            totalResumen.textContent = '$0.00';
             textoEquivalencia.textContent = '';
             ayudaDisponibilidad.textContent = 'Selecciona una combinación con stock disponible.';
             botonReservar.disabled = true;
             return;
         }
 
-        const stock = parseFloat(detalle.stock);
+        const stock = detalle.stock;
         const tipo = detalle.tipo;
         const metros = tipo === 'rollo' ? Math.round(detalle.metrosPorUnidad) : 1;
+        const cantidadMaxima = Math.floor(stock);
         const precio = detalle.precio;
 
-        let cantidadMaxima = 0;
-
-        if (tipo === 'rollo') {
-            cantidadInput.step = '1';
-            cantidadInput.min = '1';
-            cantidadMaxima = Math.floor(stock);
-            const valorActual = parseFloat(cantidadInput.value);
-            if (valorActual < 1 || Number.isNaN(valorActual)) {
-                cantidadInput.value = 1;
-            } else {
-                cantidadInput.value = Math.round(valorActual);
-            }
-        } else {
-            cantidadInput.step = '0.5';
-            cantidadInput.min = '0.5';
-            cantidadMaxima = stock;
-            if (parseFloat(cantidadInput.value) < 0.5) {
-                cantidadInput.value = 0.5;
-            }
-        }
-
-        if (cantidadMaxima > 0) {
-            cantidadInput.max = cantidadMaxima;
-        } else {
-            cantidadInput.removeAttribute('max');
-        }
-
-        const cantidadSeleccionada = parseFloat(cantidadInput.value) || 0;
-
-        if (cantidadMaxima > 0 && cantidadSeleccionada > cantidadMaxima) {
+        cantidadInput.max = cantidadMaxima > 0 ? cantidadMaxima : 1;
+        if (parseInt(cantidadInput.value, 10) > cantidadMaxima && cantidadMaxima > 0) {
             cantidadInput.value = cantidadMaxima;
         }
 
         precioUnitario.textContent = formatoMoneda.format(precio);
-        const cantidad = parseFloat(cantidadInput.value) || 0;
+        const cantidad = parseInt(cantidadInput.value, 10) || 0;
         totalResumen.textContent = formatoMoneda.format(precio * cantidad);
 
         if (stock <= 0) {
@@ -405,12 +376,9 @@ $datosVariantes = [
         } else {
             const equivalenciaTexto = tipo === 'rollo'
                 ? `Cada rollo equivale aproximadamente a ${metros} metros.`
-                : 'Puedes solicitar cortes desde 0.5 metros en adelante.';
+                : 'Compra por metro con corte industrial incluido.';
             textoEquivalencia.textContent = equivalenciaTexto;
-            const disponibleTexto = tipo === 'rollo'
-                ? `${cantidadMaxima} ${cantidadMaxima === 1 ? 'rollo' : 'rollos'}`
-                : `${formatoCantidad.format(stock)} metros`;
-            ayudaDisponibilidad.textContent = `Disponibles: ${disponibleTexto}.`;
+            ayudaDisponibilidad.textContent = `Disponibles: ${cantidadMaxima} ${tipo === 'rollo' ? 'rollos' : 'metros'}.`;
             botonReservar.disabled = cantidad <= 0;
         }
     }

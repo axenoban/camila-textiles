@@ -21,7 +21,7 @@ $productos = $productoModel->obtenerTodosLosProductos();
         ];
 
         if ($status && isset($mensajes[$status])): ?>
-        <div class="alert alert-<?= $mensajes[$status]['type']; ?> alert-dismissible fade show" role="alert" data-auto-dismiss="true">
+        <div class="alert alert-<?= $mensajes[$status]['type']; ?> alert-dismissible fade show" role="alert">
             <?= htmlspecialchars($mensajes[$status]['text'], ENT_QUOTES, 'UTF-8'); ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
@@ -57,7 +57,7 @@ $productos = $productoModel->obtenerTodosLosProductos();
                                 <td><?= '$' . number_format((float) $producto['precio'], 2); ?></td>
                                 <td class="text-nowrap">
                                     <a href="editar_producto.php?id=<?= (int) $producto['id']; ?>" class="btn btn-warning btn-sm">Editar</a>
-                                    <a href="<?= BASE_URL ?>/controllers/productos.php?accion=eliminar&amp;id=<?= (int) $producto['id']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
+                                    <a href="eliminar_producto.php?id=<?= (int) $producto['id']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
                                 </td>
                             </tr>
                             <?php endforeach; ?>

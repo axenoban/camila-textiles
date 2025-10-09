@@ -12,22 +12,33 @@
             <div class="col-12 col-xl-8">
                 <div class="form-shell">
                     <form action="productos.php" method="POST" class="row g-4">
-                        <input type="hidden" name="id" value="<?= $producto['id'] ?>">
+                        <input type="hidden" name="id" value="<?= (int) $producto['id'] ?>">
                         <div class="col-12">
                             <label for="nombre" class="form-label">Nombre del producto</label>
-                            <input type="text" class="form-control" id="nombre" name="nombre" value="<?= $producto['nombre'] ?>" required>
+                            <input type="text" class="form-control" id="nombre" name="nombre" value="<?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8') ?>" required>
                         </div>
                         <div class="col-12">
                             <label for="descripcion" class="form-label">Descripción</label>
-                            <textarea class="form-control" id="descripcion" name="descripcion" rows="4" required><?= $producto['descripcion'] ?></textarea>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="4" required><?= htmlspecialchars($producto['descripcion'], ENT_QUOTES, 'UTF-8') ?></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label for="precio" class="form-label">Precio (USD)</label>
-                            <input type="number" class="form-control" id="precio" name="precio" step="0.01" value="<?= $producto['precio'] ?>" required>
+                            <label for="color" class="form-label">Color predominante</label>
+                            <input type="text" class="form-control" id="color" name="color" value="<?= htmlspecialchars($producto['color'], ENT_QUOTES, 'UTF-8') ?>" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="unidad_venta" class="form-label">Unidad de venta</label>
+                            <select class="form-select" id="unidad_venta" name="unidad_venta" required>
+                                <option value="metro" <?= $producto['unidad_venta'] === 'metro' ? 'selected' : '' ?>>Metro lineal</option>
+                                <option value="rollo" <?= $producto['unidad_venta'] === 'rollo' ? 'selected' : '' ?>>Rollo completo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="precio" class="form-label">Precio (Bs)</label>
+                            <input type="number" class="form-control" id="precio" name="precio" step="0.01" min="0" value="<?= htmlspecialchars($producto['precio'], ENT_QUOTES, 'UTF-8') ?>" required>
                         </div>
                         <div class="col-md-6">
                             <label for="imagen" class="form-label">URL de imagen</label>
-                            <input type="url" class="form-control" id="imagen" name="imagen" value="<?= $producto['imagen'] ?>" required>
+                            <input type="url" class="form-control" id="imagen" name="imagen" value="<?= htmlspecialchars($producto['imagen'], ENT_QUOTES, 'UTF-8') ?>" required>
                         </div>
                         <div class="col-12 text-end">
                             <a href="productos.php" class="btn btn-outline-primary me-2">Volver</a>

@@ -1,7 +1,7 @@
 <?php
 // inventario.php
 
-require_once 'conexion.php';
+require_once __DIR__ . '/../database/conexion.php';
 
 class Inventario {
 
@@ -9,7 +9,7 @@ class Inventario {
     public function obtenerInventario() {
         global $pdo;
 
-        $stmt = $pdo->prepare("SELECT p.nombre, i.cantidad FROM inventarios i INNER JOIN productos p ON i.id_producto = p.id");
+        $stmt = $pdo->prepare("SELECT i.id_producto, p.nombre, p.unidad_venta, i.cantidad FROM inventarios i INNER JOIN productos p ON i.id_producto = p.id");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -19,7 +19,7 @@ class Inventario {
         global $pdo;
 
         $stmt = $pdo->prepare("INSERT INTO inventarios (id_producto, cantidad) VALUES (:id_producto, :cantidad)");
-        return $stmt->execute(['id_producto' => $idProducto, 'cantidad' => $cantidad]);
+        return $stmt->execute(['id_producto' => $idProducto, 'cantidad' => (float) $cantidad]);
     }
 
     // Método para eliminar un producto del inventario

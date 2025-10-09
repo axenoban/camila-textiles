@@ -26,7 +26,9 @@ class Pedido
         ";
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $this->adjuntarDetalles($pedidos);
     }
 
     // 🔹 Obtener pedidos de un cliente específico (para vista cliente)
@@ -68,6 +70,40 @@ class Pedido
         return $stmt->execute([
             'estado' => $nuevoEstado,
             'id' => $idPedido
+        ]);
+    }
+
+    public function crearPedido($idUsuario, $idProducto, $total) {
+        global $pdo;
+
+        $stmt = $pdo->prepare("INSERT INTO pedidos (id_usuario, id_producto, total, estado) VALUES (:id_usuario, :id_producto, :total, 'pendiente')");
+
+        $exito = $stmt->execute([
+            'id_usuario' => (int) $idUsuario,
+            'id_producto' => (int) $idProducto,
+            'total' => (float) $total,
+        ]);
+
+        if (!$exito) {
+            return 0;
+        }
+
+        return (int) $pdo->lastInsertId();
+    }
+
+    public function agregarDetalle($idPedido, $idColor, $idPresentacion, $cantidad, $unidad, $precioUnitario, $subtotal) {
+        global $pdo;
+
+        $stmt = $pdo->prepare("INSERT INTO pedido_detalles (id_pedido, id_color, id_presentacion, cantidad, unidad, precio_unitario, subtotal) VALUES (:id_pedido, :id_color, :id_presentacion, :cantidad, :unidad, :precio_unitario, :subtotal)");
+
+        return $stmt->execute([
+            'id_pedido' => (int) $idPedido,
+            'id_color' => (int) $idColor,
+            'id_presentacion' => (int) $idPresentacion,
+            'cantidad' => (float) $cantidad,
+            'unidad' => $unidad,
+            'precio_unitario' => (float) $precioUnitario,
+            'subtotal' => (float) $subtotal,
         ]);
     }
 }

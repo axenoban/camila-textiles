@@ -68,16 +68,24 @@ body.client-layout {
     padding: 42px 0 60px;
 }
 
+.main-content {
+    flex: 1;
+    padding: 48px 0 64px;
+}
+
+.section,
 .client-section {
     margin-bottom: 36px;
 }
 
+.section-title,
 .section-heading {
     font-size: clamp(1.5rem, 2.5vw, 2rem);
     font-weight: 600;
 }
 
-.section-subtitle {
+.section-subtitle,
+.text-muted {
     color: var(--client-muted);
 }
 

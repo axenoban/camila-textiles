@@ -17,7 +17,7 @@
                     <li class="nav-item"><a class="nav-link" href="perfil.php"><i class="bi bi-person me-2"></i>Mi perfil</a></li>
                 </ul>
                 <div class="ms-lg-4 mt-3 mt-lg-0">
-                    <a class="btn btn-outline-light rounded-pill px-4" href="/camila-textil/controllers/auth/logout.php">Cerrar sesión</a>
+                    <a class="btn btn-outline-light rounded-pill px-4" href="<?= BASE_URL ?>/controllers/logout.php">Cerrar sesión</a>
                 </div>
             </div>
         </div>

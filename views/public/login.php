@@ -1,28 +1,39 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../models/usuario.php';
 
 if (isset($_SESSION['usuario'])) {
-    header('Location: ' . BASE_URL . '/index.php');
+    $destino = ($_SESSION['rol'] ?? '') === 'administrador'
+        ? BASE_URL . '/views/admin/dashboard.php'
+        : BASE_URL . '/views/cliente/dashboard.php';
+    header('Location: ' . $destino);
     exit;
 }
 
 $errores = [];
-$email = '';
+$identificador = '';
+
+if (!empty($_SESSION['error_login'])) {
+    $errores[] = $_SESSION['error_login'];
+    unset($_SESSION['error_login']);
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL) ?? '';
+    $identificador = trim($_POST['email'] ?? '');
     $clave = $_POST['clave'] ?? '';
 
-    if (!$email || !$clave) {
+    if ($identificador === '' || $clave === '') {
         $errores[] = 'Ingresa tu correo electrónico y contraseña.';
     } else {
         $usuarioModel = new Usuario();
-        $resultado = $usuarioModel->autenticarUsuario($email, $clave);
+        $resultado = $usuarioModel->autenticarUsuario($identificador, $clave);
 
         if ($resultado) {
+            session_regenerate_id(true);
             $_SESSION['usuario'] = [
                 'id' => $resultado['id'],
                 'nombre' => $resultado['nombre'],
@@ -30,8 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'rol' => $resultado['rol'],
             ];
             $_SESSION['rol'] = $resultado['rol'];
-
-            header('Location: ' . BASE_URL . '/index.php');
+            $destino = $resultado['rol'] === 'administrador'
+                ? BASE_URL . '/views/admin/dashboard.php'
+                : BASE_URL . '/views/cliente/dashboard.php';
+            header('Location: ' . $destino);
             exit;
         }
 
@@ -59,8 +72,8 @@ include('includes/header.php');
                     <?php endif; ?>
                     <form method="POST" class="auth-form">
                         <div class="mb-3">
-                            <label for="email" class="form-label">Correo electrónico</label>
-                            <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>" required autofocus>
+                            <label for="email" class="form-label">Correo electrónico o usuario</label>
+                            <input type="text" class="form-control" id="email" name="email" value="<?= htmlspecialchars($identificador, ENT_QUOTES, 'UTF-8'); ?>" required autofocus>
                         </div>
                         <div class="mb-4">
                             <label for="clave" class="form-label">Contraseña</label>

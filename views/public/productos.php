@@ -27,11 +27,15 @@ $productos = $productoModel->obtenerProductosVisibles();
                     <?php foreach ($productos as $producto): ?>
                         <article class="product-card">
                             <img src="<?= htmlspecialchars($producto['imagen'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8'); ?>">
-                            <div class="card-body d-flex flex-column gap-3">
-                                <h5 class="card-title mb-0"><?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8'); ?></h5>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="card-title mb-0"><?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8'); ?></h5>
+                                    <span class="product-price">$<?= number_format($producto['precio_desde'] ?? $producto['precio'], 2) ?></span>
+                                </div>
+                                <p class="card-text mb-4"><?= htmlspecialchars($producto['descripcion'], ENT_QUOTES, 'UTF-8'); ?></p>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="product-price">Bs <?= number_format((float) ($producto['precio_metro'] ?? $producto['precio_desde'] ?? $producto['precio']), 2); ?></span>
-                                    <span class="small text-muted">por metro</span>
+                                    
+                                    <a href="<?= BASE_URL ?>/views/cliente/productos.php" class="btn btn-primary">Reservar</a>
                                 </div>
                                 <span class="badge-soft <?= ($producto['stock'] ?? 0) > 0 ? 'text-success' : 'text-danger'; ?>">
                                     <?= ($producto['stock'] ?? 0) > 0 ? 'Disponible' : 'Agotado'; ?>

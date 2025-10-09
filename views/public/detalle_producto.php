@@ -140,7 +140,7 @@ $disponible = (float) ($producto['stock_total'] ?? $producto['stock'] ?? 0) > 0;
                     <p class="text-muted mb-0">Analiza colores, presentaciones y precios para planificar tus pedidos con precisión.</p>
                 </div>
                 <div class="text-lg-end">
-                    <span class="badge bg-light text-primary fw-semibold">Precio desde Bs <?= number_format((float) ($producto['precio_desde'] ?? $producto['precio']), 2); ?></span>
+                    <span class="badge bg-light text-primary fw-semibold">Precio desde $<?= number_format((float) ($producto['precio_desde'] ?? $producto['precio']), 2); ?></span>
                     <div class="small text-muted">Estado: <?= $disponible ? 'Disponible' : 'Agotado temporalmente'; ?></div>
                 </div>
             </div>
@@ -190,7 +190,7 @@ $disponible = (float) ($producto['stock_total'] ?? $producto['stock'] ?? 0) > 0;
                                         <div class="col-sm-6">
                                             <div class="option-card <?= $activo ? 'active' : ''; ?>" data-presentacion-id="<?= (int) $presentacion['id']; ?>" data-tipo="<?= htmlspecialchars($presentacion['tipo'], ENT_QUOTES, 'UTF-8'); ?>" data-precio="<?= number_format((float) $presentacion['precio'], 2, '.', ''); ?>" data-metros="<?= number_format((float) ($presentacion['metros_por_unidad'] ?? 0), 2, '.', ''); ?>">
                                                 <strong class="d-block text-capitalize mb-1"><?= htmlspecialchars($presentacion['tipo'], ENT_QUOTES, 'UTF-8'); ?></strong>
-                                                <span class="d-block text-muted small">Bs <?= number_format((float) $presentacion['precio'], 2); ?> <?= $presentacion['tipo'] === 'rollo' ? 'por rollo' : 'por metro'; ?></span>
+                                                <span class="d-block text-muted small">$<?= number_format((float) $presentacion['precio'], 2); ?> <?= $presentacion['tipo'] === 'rollo' ? 'por rollo' : 'por metro'; ?></span>
                                                 <?php if ($presentacion['tipo'] === 'rollo'): ?>
                                                     <span class="badge-soft mt-2">≈ <?= number_format((float) ($presentacion['metros_por_unidad'] ?? 0), 0); ?> metros por rollo</span>
                                                 <?php endif; ?>
@@ -206,18 +206,18 @@ $disponible = (float) ($producto['stock_total'] ?? $producto['stock'] ?? 0) > 0;
                             <h5 class="fw-semibold mb-3">Simula tu pedido</h5>
                             <div class="input-group">
                                 <label class="input-group-text" for="cantidad">Unidades</label>
-                                <input type="number" class="form-control" id="cantidad" name="cantidad" min="0.5" step="0.5" value="1">
+                                <input type="number" class="form-control" id="cantidad" name="cantidad" min="1" value="1">
                             </div>
                             <div class="form-text" id="ayuda-disponibilidad"></div>
                         </div>
                         <div class="summary-card mb-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="text-muted">Precio unitario</span>
-                                <strong id="precio-unitario">Bs 0.00</strong>
+                                <strong id="precio-unitario">$0.00</strong>
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="text-muted">Subtotal estimado</span>
-                                <strong id="total-resumen">Bs 0.00</strong>
+                                <strong id="total-resumen">$0.00</strong>
                             </div>
                             <div class="small text-muted mt-2" id="equivalencia-texto"></div>
                         </div>
@@ -243,7 +243,7 @@ $disponible = (float) ($producto['stock_total'] ?? $producto['stock'] ?? 0) > 0;
     const ayudaDisponibilidad = document.getElementById('ayuda-disponibilidad');
     const ctaReservar = document.getElementById('cta-reservar');
 
-    const formatoMoneda = new Intl.NumberFormat('es-BO', { style: 'currency', currency: 'BOB' });
+    const formatoMoneda = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' });
 
     function obtenerDetalleSeleccion(colorId, presentacionId) {
         if (!dataVariantes.matriz[colorId] || !dataVariantes.matriz[colorId][presentacionId]) {
@@ -264,8 +264,8 @@ $disponible = (float) ($producto['stock_total'] ?? $producto['stock'] ?? 0) > 0;
         const detalle = obtenerDetalleSeleccion(colorId, presentacionId);
 
         if (!detalle) {
-            precioUnitario.textContent = 'Bs 0.00';
-            totalResumen.textContent = 'Bs 0.00';
+            precioUnitario.textContent = '$0.00';
+            totalResumen.textContent = '$0.00';
             textoEquivalencia.textContent = '';
             ayudaDisponibilidad.textContent = 'Selecciona una combinación disponible para conocer precios.';
             ctaReservar.classList.add('disabled');
@@ -279,7 +279,7 @@ $disponible = (float) ($producto['stock_total'] ?? $producto['stock'] ?? 0) > 0;
         const precio = detalle.precio;
 
         precioUnitario.textContent = formatoMoneda.format(precio);
-        const cantidad = parseFloat(cantidadInput.value) || 0;
+        const cantidad = parseInt(cantidadInput.value, 10) || 0;
         totalResumen.textContent = formatoMoneda.format(precio * cantidad);
 
         if (stock <= 0) {
@@ -290,7 +290,7 @@ $disponible = (float) ($producto['stock_total'] ?? $producto['stock'] ?? 0) > 0;
         } else {
             const equivalenciaTexto = tipo === 'rollo'
                 ? `Cada rollo equivale aproximadamente a ${metros} metros.`
-                : 'Puedes solicitar cortes informativos desde 0.5 metros.';
+                : 'Compra por metro con corte industrial incluido.';
             textoEquivalencia.textContent = equivalenciaTexto;
             ayudaDisponibilidad.textContent = 'Disponible para reservas inmediatas.';
             ctaReservar.classList.remove('disabled');

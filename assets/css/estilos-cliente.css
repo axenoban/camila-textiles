@@ -91,6 +91,90 @@ body.client-layout {
     height: 100%;
 }
 
+.product-grid {
+    display: grid;
+    gap: 2.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.product-card {
+    background-color: var(--client-surface);
+    border-radius: calc(var(--client-radius) + 6px);
+    box-shadow: var(--client-shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 28px 60px rgba(15, 23, 42, 0.18);
+}
+
+.product-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.product-media {
+    position: relative;
+}
+
+.availability {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background-color: rgba(15, 23, 42, 0.72);
+    color: #fff;
+}
+
+.availability.available {
+    background: rgba(16, 185, 129, 0.88);
+}
+
+.availability.soldout {
+    background: rgba(239, 68, 68, 0.88);
+}
+
+.product-price {
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #1f2937;
+}
+
+.color-palette {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.color-chip {
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.1);
+}
+
+.color-chip.more {
+    background: rgba(99, 102, 241, 0.16);
+    color: var(--client-primary);
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
 .portal-card:hover {
     transform: translateY(-6px);
     transition: transform 0.35s ease, box-shadow 0.35s ease;
@@ -207,5 +291,9 @@ body.client-layout {
     .portal-table,
     .portal-form {
         padding: 24px;
+    }
+
+    .product-card img {
+        height: 200px;
     }
 }

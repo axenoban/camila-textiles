@@ -34,10 +34,10 @@ $productos = $productoModel->obtenerProductosVisibles();
                                 </div>
                                 <p class="card-text mb-4"><?= htmlspecialchars($producto['descripcion'], ENT_QUOTES, 'UTF-8'); ?></p>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="badge-soft <?= ($producto['stock'] ?? 0) > 0 ? 'text-success' : 'text-danger'; ?>">
-                                        <?= ($producto['stock'] ?? 0) > 0 ? 'Disponible' : 'Agotado'; ?>
+                                    <span class="badge-soft <?= ($producto['stock'] ?? 0) > 0 ? '' : 'text-danger'; ?>">
+                                        <?= ($producto['stock'] ?? 0) > 0 ? 'Stock disponible: ' . (int) $producto['stock'] : 'Sin stock en este momento'; ?>
                                     </span>
-                                    <a href="<?= BASE_URL ?>/views/public/login.php" class="btn btn-primary">Reservar</a>
+                                    <a href="<?= BASE_URL ?>/views/cliente/productos.php" class="btn btn-primary">Reservar</a>
                                 </div>
                             </div>
                         </article>

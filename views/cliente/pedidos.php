@@ -5,30 +5,6 @@ require_once __DIR__ . '/../../models/pedido.php';
 $pedidoModel = new Pedido();
 $pedidosCliente = $pedidoModel->obtenerPedidosPorCliente($clienteActual['id']);
 
-$pedidosCliente = array_map(function ($pedido) {
-    $unidad = $pedido['unidad'] ?? 'metro';
-    $cantidad = (int) ($pedido['cantidad'] ?? 0);
-    $presentacion = $pedido['presentacion_tipo'] ?? $unidad;
-    $metrosUnidad = (int) round($pedido['metros_por_unidad'] ?? 0);
-
-    if ($unidad === 'rollo' && $cantidad > 0) {
-        $cantidadLegible = $cantidad . ' ' . ($cantidad === 1 ? 'rollo' : 'rollos');
-        if ($metrosUnidad > 0) {
-            $cantidadLegible .= ' · ' . $metrosUnidad . ' m c/u';
-        }
-    } else {
-        $cantidadLegible = $cantidad . ' ' . ($cantidad === 1 ? 'metro' : 'metros');
-    }
-
-    $pedido['cantidad_legible'] = $cantidadLegible;
-    $pedido['presentacion_legible'] = ucfirst($presentacion);
-    $pedido['color_legible'] = $pedido['color_nombre'] ?? 'A confirmar';
-    $pedido['precio_unitario_formateado'] = number_format((float) ($pedido['precio_unitario'] ?? 0), 2);
-    $pedido['total_formateado'] = number_format((float) ($pedido['total'] ?? 0), 2);
-
-    return $pedido;
-}, $pedidosCliente);
-
 $pedidosActivos = array_values(array_filter($pedidosCliente, function ($pedido) {
     return in_array($pedido['estado'], ['pendiente', 'confirmado'], true);
 }));
@@ -78,54 +54,23 @@ unset($_SESSION['reserva_mensaje'], $_SESSION['reserva_tipo']);
                         <tbody>
                             <?php if (!empty($pedidosActivos)): ?>
                                 <?php foreach ($pedidosActivos as $pedido): ?>
-                                <tr>
+                                    <tr>
                                     <td><?= (int) $pedido['id']; ?></td>
                                     <td><?= htmlspecialchars($pedido['producto'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                    <td><?= htmlspecialchars($pedido['presentacion_legible'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                    <td>
-                                        <span class="badge-soft"><?= htmlspecialchars($pedido['color_legible'], ENT_QUOTES, 'UTF-8'); ?></span>
-                                    </td>
-                                    <td><?= htmlspecialchars($pedido['cantidad_legible'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                    <td>$<?= htmlspecialchars($pedido['total_formateado'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td><?= (int) $pedido['cantidad']; ?></td>
                                     <td>
                                         <span class="status-pill status-<?= htmlspecialchars($pedido['estado'], ENT_QUOTES, 'UTF-8'); ?>">
                                             <?= htmlspecialchars(ucfirst($pedido['estado']), ENT_QUOTES, 'UTF-8'); ?>
                                         </span>
                                     </td>
                                     <td class="text-end text-nowrap">
-                                        <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#detalle-pedido-<?= (int) $pedido['id']; ?>" aria-expanded="false" aria-controls="detalle-pedido-<?= (int) $pedido['id']; ?>">
-                                            Mostrar detalles
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="collapse" id="detalle-pedido-<?= (int) $pedido['id']; ?>">
-                                    <td colspan="8" class="bg-light">
-                                        <div class="row g-3">
-                                            <div class="col-md-3">
-                                                <div class="small text-muted">Precio unitario</div>
-                                                <strong>$<?= htmlspecialchars($pedido['precio_unitario_formateado'], ENT_QUOTES, 'UTF-8'); ?></strong>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="small text-muted">Color seleccionado</div>
-                                                <span class="badge bg-secondary-subtle text-dark"><?= htmlspecialchars($pedido['color_legible'], ENT_QUOTES, 'UTF-8'); ?></span>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="small text-muted">Presentación</div>
-                                                <span class="badge bg-secondary-subtle text-dark"><?= htmlspecialchars($pedido['presentacion_legible'], ENT_QUOTES, 'UTF-8'); ?></span>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="small text-muted">Estado actual</div>
-                                                <span class="status-pill status-<?= htmlspecialchars($pedido['estado'], ENT_QUOTES, 'UTF-8'); ?>">
-                                                    <?= htmlspecialchars(ucfirst($pedido['estado']), ENT_QUOTES, 'UTF-8'); ?>
-                                                </span>
-                                            </div>
-                                        </div>
+                                        <a href="#" class="btn btn-info btn-sm disabled" aria-disabled="true">Ver detalles</a>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted py-4">Aún no tienes pedidos activos. Reserva tu próxima tela desde el catálogo.</td>
+                                    <td colspan="5" class="text-center text-muted py-4">Aún no tienes pedidos activos. Reserva tu próxima tela desde el catálogo.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -156,17 +101,14 @@ unset($_SESSION['reserva_mensaje'], $_SESSION['reserva_tipo']);
                                 <tr>
                                     <td><?= (int) $pedido['id']; ?></td>
                                     <td><?= htmlspecialchars($pedido['producto'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                    <td><?= htmlspecialchars($pedido['presentacion_legible'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                    <td><span class="badge-soft"><?= htmlspecialchars($pedido['color_legible'], ENT_QUOTES, 'UTF-8'); ?></span></td>
-                                    <td><?= htmlspecialchars($pedido['cantidad_legible'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                    <td>$<?= htmlspecialchars($pedido['total_formateado'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td><?= (int) $pedido['cantidad']; ?></td>
                                     <td><?= htmlspecialchars(ucfirst($pedido['estado']), ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td><?= htmlspecialchars($pedido['fecha_formateada'], ENT_QUOTES, 'UTF-8'); ?></td>
                                 </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted py-4">Aquí aparecerá tu historial en cuanto completes tus primeros pedidos.</td>
+                                    <td colspan="5" class="text-center text-muted py-4">Aquí aparecerá tu historial en cuanto completes tus primeros pedidos.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>

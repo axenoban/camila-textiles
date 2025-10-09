@@ -26,24 +26,22 @@ $productos = $productoModel->obtenerProductosVisibles();
             <?php if (!empty($productos)): ?>
                 <?php foreach ($productos as $producto): ?>
                 <div class="col-12 col-md-6 col-xl-4">
-                    <div class="portal-card h-100 d-flex flex-column">
+                    <div class="portal-card h-100">
                         <img src="<?= htmlspecialchars($producto['imagen'], ENT_QUOTES, 'UTF-8'); ?>" class="img-fluid rounded-4 mb-3" alt="<?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8'); ?>">
                         <div class="d-flex justify-content-between align-items-start">
                             <h5 class="fw-semibold mb-1"><?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8'); ?></h5>
-                            <span class="badge bg-light text-primary fw-semibold">$<?= number_format((float) ($producto['precio_desde'] ?? $producto['precio']), 2); ?> <small class="text-muted">desde</small></span>
+                            <span class="badge bg-light text-primary fw-semibold">$<?= number_format((float) $producto['precio'], 2); ?></span>
                         </div>
-                        <p class="text-muted mb-4 flex-grow-1"><?= htmlspecialchars($producto['descripcion'], ENT_QUOTES, 'UTF-8'); ?></p>
-                        <div class="d-flex flex-column gap-2">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="badge-soft <?= ($producto['stock'] ?? 0) > 0 ? 'text-success' : 'text-danger'; ?>">
-                                    <?= ($producto['stock'] ?? 0) > 0 ? 'Disponibilidad confirmada' : 'Agotado temporalmente'; ?>
-                                </span>
-                                <?php if ((int) ($producto['total_colores'] ?? 0) > 0): ?>
-                                    <span class="small text-muted"><?= (int) $producto['total_colores']; ?> colores activos</span>
-                                <?php endif; ?>
+                        <p class="text-muted mb-4"><?= htmlspecialchars($producto['descripcion'], ENT_QUOTES, 'UTF-8'); ?></p>
+                        <p class="small text-muted mb-3">Stock disponible: <?= (int) ($producto['stock'] ?? 0); ?> unidades</p>
+                        <form action="<?= BASE_URL ?>/controllers/pedidos_cliente.php" method="POST" class="d-grid gap-2">
+                            <input type="hidden" name="producto_id" value="<?= (int) $producto['id']; ?>">
+                            <div class="input-group">
+                                <label class="input-group-text" for="cantidad-<?= (int) $producto['id']; ?>">Cantidad</label>
+                                <input type="number" class="form-control" id="cantidad-<?= (int) $producto['id']; ?>" name="cantidad" min="1" value="1" required>
                             </div>
-                            <a href="<?= BASE_URL ?>/views/cliente/detalle_producto.php?id=<?= (int) $producto['id']; ?>" class="btn btn-primary">Ver detalle y reservar</a>
-                        </div>
+                            <button type="submit" class="btn btn-primary">Reservar ahora</button>
+                        </form>
                     </div>
                 </div>
                 <?php endforeach; ?>

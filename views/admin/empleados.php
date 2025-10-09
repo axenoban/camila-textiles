@@ -57,7 +57,7 @@ $empleados = $empleadoModel->obtenerEmpleados();
                                 <td><?= '$' . number_format((float) $empleado['salario'], 2); ?></td>
                                 <td class="text-end text-nowrap">
                                     <a href="editar_empleado.php?id=<?= (int) $empleado['id']; ?>" class="btn btn-warning btn-sm">Editar</a>
-                                    <a href="<?= BASE_URL ?>/controllers/empleados.php?accion=eliminar&amp;id=<?= (int) $empleado['id']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
+                                    <a href="eliminar_empleado.php?id=<?= (int) $empleado['id']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
                                 </td>
                             </tr>
                             <?php endforeach; ?>

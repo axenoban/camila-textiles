@@ -45,7 +45,7 @@
                         <p class="text-muted mb-0">El sistema gestiona transferencias entre sucursales según la demanda de cada cliente, optimizando tiempos de entrega y disponibilidad.</p>
                     </div>
                     <div class="col-md-4 text-md-end">
-                        <a class="btn btn-primary rounded-pill px-4" href="/camila-textil/views/public/contacto.php">Agendar visita</a>
+                        <a class="btn btn-primary rounded-pill px-4" href="<?= BASE_URL ?>/views/public/contacto.php">Agendar visita</a>
                     </div>
                 </div>
             </div>

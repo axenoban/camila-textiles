@@ -1,3 +1,9 @@
+<?php
+require_once __DIR__ . '/../../models/inventario.php';
+
+$inventarioModel = new Inventario();
+$inventario = $inventarioModel->obtenerInventario();
+?>
 <!-- views/admin/inventario.php -->
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
@@ -19,16 +25,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($inventario as $item): ?>
+                        <?php if (!empty($inventario)): ?>
+                            <?php foreach ($inventario as $item): ?>
                             <tr>
-                                <td><?= $item['nombre'] ?></td>
-                                <td><?= $item['cantidad'] ?></td>
+                                <td><?= htmlspecialchars($item['nombre'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?= (int) $item['cantidad']; ?></td>
                                 <td class="text-end text-nowrap">
-                                    <a href="agregar_inventario.php?id=<?= $item['id_producto'] ?>" class="btn btn-info btn-sm me-2">Ajustar stock</a>
-                                    <a href="eliminar_inventario.php?id=<?= $item['id_producto'] ?>" class="btn btn-danger btn-sm">Reducir</a>
+                                    <a href="agregar_inventario.php?id=<?= (int) $item['id_producto']; ?>" class="btn btn-info btn-sm me-2">Ajustar stock</a>
+                                    <a href="eliminar_inventario.php?id=<?= (int) $item['id_producto']; ?>" class="btn btn-danger btn-sm">Reducir</a>
                                 </td>
                             </tr>
-                        <?php endforeach; ?>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-4">No hay existencias registradas.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

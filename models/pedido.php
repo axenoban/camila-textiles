@@ -5,7 +5,61 @@ require_once __DIR__ . '/../database/conexion.php';
 
 class Pedido {
 
-    // Método para obtener los pedidos de un cliente
+    private function adjuntarDetalles(array $pedidos) {
+        if (empty($pedidos)) {
+            return [];
+        }
+
+        global $pdo;
+
+        $ids = array_map(static fn($pedido) => (int) ($pedido['id'] ?? 0), $pedidos);
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+        $sql = "
+            SELECT
+                pd.id,
+                pd.id_pedido,
+                pd.id_color,
+                pd.id_presentacion,
+                pd.cantidad,
+                pd.unidad,
+                pd.precio_unitario,
+                pd.subtotal,
+                pc.nombre AS color_nombre,
+                pc.codigo_hex,
+                pp.tipo AS presentacion_tipo,
+                pp.metros_por_unidad
+            FROM pedido_detalles pd
+            INNER JOIN producto_colores pc ON pd.id_color = pc.id
+            INNER JOIN producto_presentaciones pp ON pd.id_presentacion = pp.id
+            WHERE pd.id_pedido IN ($placeholders)
+            ORDER BY pd.id
+        ";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($ids);
+        $detalles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $porPedido = [];
+        foreach ($detalles as $detalle) {
+            $pedidoId = (int) ($detalle['id_pedido'] ?? 0);
+            $detalle['cantidad'] = (float) ($detalle['cantidad'] ?? 0);
+            $detalle['precio_unitario'] = (float) ($detalle['precio_unitario'] ?? 0);
+            $detalle['subtotal'] = (float) ($detalle['subtotal'] ?? 0);
+            $detalle['metros_por_unidad'] = $detalle['metros_por_unidad'] !== null
+                ? (float) $detalle['metros_por_unidad']
+                : null;
+            $porPedido[$pedidoId][] = $detalle;
+        }
+
+        foreach ($pedidos as &$pedido) {
+            $pedidoId = (int) ($pedido['id'] ?? 0);
+            $pedido['detalles'] = $porPedido[$pedidoId] ?? [];
+        }
+
+        return $pedidos;
+    }
+
     public function obtenerPedidosPorCliente($idUsuario) {
         global $pdo;
 
@@ -14,7 +68,6 @@ class Pedido {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Método para obtener todos los pedidos
     public function obtenerTodosLosPedidos() {
         global $pdo;
 
@@ -37,10 +90,11 @@ class Pedido {
 
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $this->adjuntarDetalles($pedidos);
     }
 
-    // Método para obtener pedidos con detalles y límite configurable
     public function obtenerPedidosConDetalles($limite = null) {
         $pedidos = $this->obtenerTodosLosPedidos();
 
@@ -51,16 +105,14 @@ class Pedido {
         return $pedidos;
     }
 
-    // Método para contar pedidos por estado
     public function contarPedidosPorEstado($estado) {
         global $pdo;
 
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM pedidos WHERE estado = :estado");
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM pedidos WHERE estado = :estado');
         $stmt->execute(['estado' => $estado]);
         return (int) $stmt->fetchColumn();
     }
 
-    // Método para calcular el ingreso estimado de los pedidos
     public function calcularIngresosTotales() {
         global $pdo;
 
@@ -68,7 +120,6 @@ class Pedido {
         return (float) $stmt->fetchColumn();
     }
 
-    // Método para confirmar un pedido
     public function confirmarPedido($id) {
         global $pdo;
 
@@ -76,7 +127,6 @@ class Pedido {
         return $stmt->execute(['id' => $id]);
     }
 
-    // Método para completar un pedido
     public function completarPedido($id) {
         global $pdo;
 
@@ -84,7 +134,6 @@ class Pedido {
         return $stmt->execute(['id' => $id]);
     }
 
-    // Método para cancelar un pedido
     public function cancelarPedido($id) {
         global $pdo;
 

@@ -57,7 +57,9 @@ $pedidos = $pedidoModel->obtenerTodosLosPedidos();
                     </tbody>
                 </table>
             </div>
-        </div>
+        <?php else: ?>
+            <div class="alert alert-info" role="alert">No hay pedidos registrados en este momento.</div>
+        <?php endif; ?>
     </div>
 </main>
 

@@ -76,8 +76,11 @@ unset($_SESSION['reserva_mensaje'], $_SESSION['reserva_tipo']);
                         </tbody>
                     </table>
                 </div>
-            </div>
+            <?php else: ?>
+                <div class="alert alert-info" role="alert">Aún no tienes pedidos activos. Reserva tu próxima tela desde el catálogo.</div>
+            <?php endif; ?>
         </div>
+
         <div class="client-section">
             <h2 class="h5 fw-semibold mb-3">Historial de pedidos</h2>
             <div class="portal-table">
@@ -114,7 +117,9 @@ unset($_SESSION['reserva_mensaje'], $_SESSION['reserva_tipo']);
                         </tbody>
                     </table>
                 </div>
-            </div>
+            <?php else: ?>
+                <div class="alert alert-secondary" role="alert">Aquí aparecerá tu historial en cuanto completes tus primeros pedidos.</div>
+            <?php endif; ?>
         </div>
     </div>
 </main>

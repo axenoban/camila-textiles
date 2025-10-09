@@ -18,7 +18,53 @@ class Producto {
     public function obtenerTodosLosProductos() {
         global $pdo;
 
-        $stmt = $pdo->prepare("SELECT * FROM productos ORDER BY fecha_creacion DESC");
+        $sql = "
+            SELECT
+                p.*,
+                COALESCE(variantes.stock_total, i.cantidad, 0) AS stock,
+                COALESCE(precios.precio_metro, precios.precio_desde, p.precio) AS precio_metro,
+                COALESCE(precios.precio_desde, p.precio) AS precio_desde,
+                COALESCE(colores.total_colores, 0) AS total_colores,
+                COALESCE(presentaciones.total_presentaciones, 0) AS total_presentaciones
+            FROM productos p
+            LEFT JOIN (
+                SELECT
+                    pe.id_producto,
+                    SUM(
+                        CASE
+                            WHEN pp.tipo = 'rollo' THEN pe.stock * COALESCE(pp.metros_por_unidad, 0)
+                            ELSE pe.stock
+                        END
+                    ) AS stock_total
+                FROM producto_existencias pe
+                INNER JOIN producto_presentaciones pp ON pe.id_presentacion = pp.id
+                GROUP BY pe.id_producto
+            ) AS variantes ON variantes.id_producto = p.id
+            LEFT JOIN inventarios i ON i.id_producto = p.id
+            LEFT JOIN (
+                SELECT
+                    id_producto,
+                    MIN(precio) AS precio_desde,
+                    MIN(
+                        CASE
+                            WHEN tipo = 'metro' THEN precio
+                            WHEN tipo = 'rollo' AND COALESCE(metros_por_unidad, 0) > 0 THEN precio / metros_por_unidad
+                            ELSE NULL
+                        END
+                    ) AS precio_metro
+                FROM producto_presentaciones
+                GROUP BY id_producto
+            ) AS precios ON precios.id_producto = p.id
+            LEFT JOIN (
+                SELECT id_producto, COUNT(*) AS total_colores FROM producto_colores GROUP BY id_producto
+            ) AS colores ON colores.id_producto = p.id
+            LEFT JOIN (
+                SELECT id_producto, COUNT(*) AS total_presentaciones FROM producto_presentaciones GROUP BY id_producto
+            ) AS presentaciones ON presentaciones.id_producto = p.id
+            ORDER BY p.fecha_creacion DESC
+        ";
+
+        $stmt = $pdo->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -166,6 +212,16 @@ class Producto {
 
         $stmt = $pdo->prepare("DELETE FROM productos WHERE id = :id");
         return $stmt->execute(['id' => $id]);
+    }
+
+    public function actualizarVisibilidad($idProducto, $visible) {
+        global $pdo;
+
+        $stmt = $pdo->prepare('UPDATE productos SET visible = :visible WHERE id = :id');
+        return $stmt->execute([
+            'visible' => $visible ? 1 : 0,
+            'id' => (int) $idProducto,
+        ]);
     }
 }
 ?>

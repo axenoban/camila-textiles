@@ -1,91 +1,105 @@
 <?php
-// usuario.php
-
 require_once __DIR__ . '/../database/conexion.php';
 
 class Usuario {
 
-    // Método para autenticar un usuario
+    // ✅ Método corregido para autenticar un usuario
     public function autenticarUsuario($identificador, $clave) {
         global $pdo;
 
-        $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = :identificador OR nombre = :identificador LIMIT 1");
-        $stmt->execute(['identificador' => $identificador]);
-        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            // Buscar por email o nombre
+            $stmt = $pdo->prepare("
+                SELECT * FROM usuarios 
+                WHERE email = :identificador OR nombre = :identificador 
+                LIMIT 1
+            ");
+            $stmt->execute(['identificador' => $identificador]);
+            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($usuario) {
-            $infoClave = password_get_info($usuario['clave']);
-
-            // Si la clave no está cifrada, validamos en texto plano y la ciframos para futuros accesos
-            if ($infoClave['algo'] === 0) {
-                if (hash_equals($usuario['clave'], $clave)) {
-                    $nuevoHash = password_hash($clave, PASSWORD_BCRYPT);
-                    $actualizar = $pdo->prepare('UPDATE usuarios SET clave = :clave WHERE id = :id');
-                    $actualizar->execute(['clave' => $nuevoHash, 'id' => $usuario['id']]);
-                    $usuario['clave'] = $nuevoHash;
-                } else {
-                    return false;
-                }
+            // Si no se encuentra el usuario
+            if (!$usuario) {
+                return false;
             }
 
+            // Si la contraseña está hasheada correctamente (BCRYPT, ARGON, etc.)
             if (password_verify($clave, $usuario['clave'])) {
                 return $usuario;
             }
+
+            // ⚠️ En caso de contraseñas antiguas sin hash (texto plano)
+            if (hash_equals($usuario['clave'], $clave)) {
+                // Actualizamos inmediatamente a formato seguro
+                $nuevoHash = password_hash($clave, PASSWORD_DEFAULT);
+                $update = $pdo->prepare("UPDATE usuarios SET clave = :clave WHERE id = :id");
+                $update->execute(['clave' => $nuevoHash, 'id' => $usuario['id']]);
+                $usuario['clave'] = $nuevoHash;
+                return $usuario;
+            }
+
+            // Si no coincide ninguna validación
+            return false;
+
+        } catch (PDOException $e) {
+            error_log("Error al autenticar usuario: " . $e->getMessage());
+            return false;
         }
-        return false;
     }
 
+    // ✅ Contar clientes activos
     public function contarClientesActivos() {
         global $pdo;
-
-        return (int) $pdo->query("SELECT COUNT(*) FROM usuarios WHERE rol = 'cliente'")->fetchColumn();
+        return (int)$pdo->query("SELECT COUNT(*) FROM usuarios WHERE rol = 'cliente'")->fetchColumn();
     }
 
-    // Método para obtener todos los usuarios
+    // ✅ Obtener todos los usuarios
     public function obtenerUsuarios() {
         global $pdo;
-
         $stmt = $pdo->prepare("SELECT * FROM usuarios");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Método para obtener un usuario por ID
+    // ✅ Obtener usuario por ID
     public function obtenerUsuarioPorId($id) {
         global $pdo;
-
         $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = :id");
         $stmt->execute(['id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    // ✅ Actualizar perfil
     public function actualizarPerfil($id, $nombre, $email, $clave = null) {
         global $pdo;
 
-        $datos = [
-            'id' => $id,
-            'nombre' => $nombre,
-            'email' => $email,
-        ];
+        $campos = ['nombre' => $nombre, 'email' => $email, 'id' => $id];
+        $sql = "UPDATE usuarios SET nombre = :nombre, email = :email";
 
-        $set = 'nombre = :nombre, email = :email';
-
-        if ($clave !== null) {
-            $datos['clave'] = password_hash($clave, PASSWORD_BCRYPT);
-            $set .= ', clave = :clave';
+        if (!empty($clave)) {
+            $campos['clave'] = password_hash($clave, PASSWORD_DEFAULT);
+            $sql .= ", clave = :clave";
         }
 
-        $stmt = $pdo->prepare("UPDATE usuarios SET $set WHERE id = :id");
-        return $stmt->execute($datos);
+        $sql .= " WHERE id = :id";
+        $stmt = $pdo->prepare($sql);
+        return $stmt->execute($campos);
     }
 
-    // Método para crear un nuevo usuario
+    // ✅ Crear nuevo usuario
     public function crearUsuario($nombre, $email, $clave, $rol = 'cliente') {
         global $pdo;
-        
-        $claveEncriptada = password_hash($clave, PASSWORD_BCRYPT);  // Encriptar la clave
-        $stmt = $pdo->prepare("INSERT INTO usuarios (nombre, email, clave, rol) VALUES (:nombre, :email, :clave, :rol)");
-        return $stmt->execute(['nombre' => $nombre, 'email' => $email, 'clave' => $claveEncriptada, 'rol' => $rol]);
+
+        $claveHash = password_hash($clave, PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("
+            INSERT INTO usuarios (nombre, email, clave, rol) 
+            VALUES (:nombre, :email, :clave, :rol)
+        ");
+        return $stmt->execute([
+            'nombre' => $nombre,
+            'email' => $email,
+            'clave' => $claveHash,
+            'rol' => $rol
+        ]);
     }
 }
 ?>

@@ -1,3 +1,15 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/../../../config/app.php';
+
+if (empty($_SESSION['usuario']) || ($_SESSION['rol'] ?? null) !== 'administrador') {
+    header('Location: ' . BASE_URL . '/views/public/login.php');
+    exit;
+}
+?>
 <!-- views/admin/includes/header.php -->
 <!DOCTYPE html>
 <html lang="es">

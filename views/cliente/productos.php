@@ -1,6 +1,16 @@
 <!-- views/cliente/productos.php -->
-<?php include('includes/header.php'); ?>
-<?php include('includes/navbar.php'); ?>
+<?php
+if (!isset($productos) || !is_array($productos)) {
+    require_once __DIR__ . '/../../database/conexion.php';
+    require_once __DIR__ . '/../../models/producto.php';
+
+    $productoModel = new Producto();
+    $productos = $productoModel->obtenerProductosVisibles();
+}
+
+include('includes/header.php');
+include('includes/navbar.php');
+?>
 
 <main class="main-area">
     <div class="container-fluid px-4 px-lg-5">
@@ -17,7 +27,8 @@
             </div>
         </section>
         <div class="row g-4">
-            <?php foreach ($productos as $producto): ?>
+            <?php if (!empty($productos)): ?>
+                <?php foreach ($productos as $producto): ?>
                 <div class="col-12 col-md-6 col-xl-4">
                     <div class="portal-card h-100">
                         <?php
@@ -44,7 +55,14 @@
                         <a href="agregar_pedido.php?id=<?= $producto['id'] ?>" class="btn btn-primary w-100">Reservar ahora</a>
                     </div>
                 </div>
-            <?php endforeach; ?>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="col-12">
+                    <div class="alert alert-info" role="alert">
+                        No hay productos disponibles en este momento. Vuelve pronto para descubrir nuevas telas.
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </main>

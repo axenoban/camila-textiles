@@ -1,7 +1,7 @@
 <?php
 // usuario.php
 
-require_once 'conexion.php';
+require_once __DIR__ . '/../database/conexion.php';
 
 class Usuario {
 

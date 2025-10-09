@@ -78,14 +78,10 @@ CREATE TABLE sucursales (
 -- Datos de ejemplo realistas
 
 -- Usuarios (un administrador y dos clientes)
--- Las contraseñas en texto plano son:
---   Administrador: AdminCamila2024!
---   Lucía Fernández: ClienteLuz#1
---   Marcos Delgado: ClienteMarcos#1
-INSERT INTO usuarios (nombre, email, clave, rol) VALUES
-('Camila Rivas', 'admin@camilatextiles.com', '$2y$12$uDAkRi3woqTwT3QC2dizwuIagONG3kbZ5YA2G4D0fRUv3KEeXe2LS', 'administrador'),
-('Lucía Fernández', 'lucia.fernandez@example.com', '$2y$12$3jhMOzbJIBSUFRt1uAd97.sZ2QjCPeUvKLg5IevmWr.6XN2GiJGuK', 'cliente'),
-('Marcos Delgado', 'marcos.delgado@example.com', '$2y$12$PRbyvWM4DMBUF7fVIM72d.At88famT7P4PQdmxWwXqLImlUHf5pL2', 'cliente');
+I0N0S0E0R0T0 0I0N0T0O0 0u0s0u0a0r0i0o0s0 0(0n0o0m0b0r0e0,0 0e0m0a0i0l0,0 0c0l0a0v0e0,0 0r0o0l0)0 0V0A0L0U0E0S0
+0(0'0C0a0m0i0l0a0 0R0i0v0a0s0'0,0 0'0a0d0m0i0n0@0c0a0m0i0l0a0t0e0x0t0i0l0e0s0.0c0o0m0'0,0 0'0$020y$12$IZg2ygBFt728hSrSVFfVEeyllnPpCrPHKle5pUs9mw5fgfOFTJ3x.', 'administrador'),
+('Lucía Fernández', 'lucia.fernandez@example.com', '$2y$12$COytam4/33Irk1uUJ8UCLOnvtZHLxdWOmEa0RYgI7wd3e7j0TmsUW', 'cliente'),
+('Marcos Delgado', 'marcos.delgado@example.com', '$2y$12$HhptmQQo1zLJDjUJeE2HVuzNh4h19ngGZE1ftgZ8Rd62X.qxq5XSy', 'cliente');
 
 -- Productos textiles con imágenes externas para el catálogo
 INSERT INTO productos (nombre, descripcion, precio, imagen, visible) VALUES

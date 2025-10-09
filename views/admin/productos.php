@@ -69,9 +69,7 @@ $productos = $productoModel->obtenerTodosLosProductos();
                     </tbody>
                 </table>
             </div>
-        <?php else: ?>
-            <div class="alert alert-info" role="alert">No hay productos registrados todavía.</div>
-        <?php endif; ?>
+       </div>   
     </div>
 </main>
 

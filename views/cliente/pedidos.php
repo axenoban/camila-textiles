@@ -5,16 +5,12 @@ require_once __DIR__ . '/../../models/pedido.php';
 $pedidoModel = new Pedido();
 $pedidosCliente = $pedidoModel->obtenerPedidosPorCliente($clienteActual['id']);
 
-$pedidosActivos = array_values(array_filter($pedidosCliente, function ($pedido) {
-    return in_array($pedido['estado'], ['pendiente', 'confirmado'], true);
-}));
+$pedidosActivos = array_values(array_filter($pedidosCliente, fn($p) => in_array($p['estado'], ['pendiente', 'confirmado'], true)));
 
-$pedidosHistoricos = array_map(function ($pedido) {
-    $pedido['fecha_formateada'] = date('d/m/Y', strtotime($pedido['fecha_creacion']));
-    return $pedido;
-}, array_values(array_filter($pedidosCliente, function ($pedido) {
-    return in_array($pedido['estado'], ['completado', 'cancelado'], true);
-})));
+$pedidosHistoricos = array_map(function ($p) {
+    $p['fecha_formateada'] = date('d/m/Y', strtotime($p['fecha_creacion']));
+    return $p;
+}, array_values(array_filter($pedidosCliente, fn($p) => in_array($p['estado'], ['completado', 'cancelado'], true))));
 
 $mensajeReserva = $_SESSION['reserva_mensaje'] ?? null;
 $tipoReserva = $_SESSION['reserva_tipo'] ?? null;
@@ -29,11 +25,14 @@ unset($_SESSION['reserva_mensaje'], $_SESSION['reserva_tipo']);
             <h1 class="section-heading">Mis pedidos</h1>
             <p class="section-subtitle">Supervisa tus pedidos activos y consulta tu historial en un panel claro y accesible.</p>
         </section>
+
         <?php if ($mensajeReserva): ?>
             <div class="alert alert-<?= $tipoReserva === 'success' ? 'success' : 'danger'; ?>" role="alert">
                 <?= htmlspecialchars($mensajeReserva, ENT_QUOTES, 'UTF-8'); ?>
             </div>
         <?php endif; ?>
+
+        <!-- 🟩 Pedidos activos -->
         <div class="client-section">
             <h2 class="h5 fw-semibold mb-3">Pedidos actuales</h2>
             <div class="portal-table">
@@ -55,32 +54,36 @@ unset($_SESSION['reserva_mensaje'], $_SESSION['reserva_tipo']);
                             <?php if (!empty($pedidosActivos)): ?>
                                 <?php foreach ($pedidosActivos as $pedido): ?>
                                     <tr>
-                                    <td><?= (int) $pedido['id']; ?></td>
-                                    <td><?= htmlspecialchars($pedido['producto'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                    <td><?= (int) $pedido['cantidad']; ?></td>
-                                    <td>
-                                        <span class="status-pill status-<?= htmlspecialchars($pedido['estado'], ENT_QUOTES, 'UTF-8'); ?>">
-                                            <?= htmlspecialchars(ucfirst($pedido['estado']), ENT_QUOTES, 'UTF-8'); ?>
-                                        </span>
-                                    </td>
-                                    <td class="text-end text-nowrap">
-                                        <a href="#" class="btn btn-info btn-sm disabled" aria-disabled="true">Ver detalles</a>
-                                    </td>
-                                </tr>
+                                        <td><?= (int) $pedido['id']; ?></td>
+                                        <td><?= htmlspecialchars($pedido['producto'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td><?= htmlspecialchars($pedido['presentacion'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td><?= htmlspecialchars($pedido['color'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td><?= (float) $pedido['cantidad']; ?></td>
+                                        <td>$<?= number_format(($pedido['precio_unitario'] ?? 0) * $pedido['cantidad'], 2); ?></td>
+                                        <td>
+                                            <span class="status-pill status-<?= htmlspecialchars($pedido['estado'], ENT_QUOTES, 'UTF-8'); ?>">
+                                                <?= htmlspecialchars(ucfirst($pedido['estado']), ENT_QUOTES, 'UTF-8'); ?>
+                                            </span>
+                                        </td>
+                                        <td class="text-end text-nowrap">
+                                            <a href="#" class="btn btn-info btn-sm disabled" aria-disabled="true">Ver detalles</a>
+                                        </td>
+                                    </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-4">Aún no tienes pedidos activos. Reserva tu próxima tela desde el catálogo.</td>
+                                    <td colspan="8" class="text-center text-muted py-4">
+                                        Aún no tienes pedidos activos. Reserva tu próxima tela desde el catálogo.
+                                    </td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
-            <?php else: ?>
-                <div class="alert alert-info" role="alert">Aún no tienes pedidos activos. Reserva tu próxima tela desde el catálogo.</div>
-            <?php endif; ?>
+            </div>
         </div>
 
+        <!-- 🟦 Historial -->
         <div class="client-section">
             <h2 class="h5 fw-semibold mb-3">Historial de pedidos</h2>
             <div class="portal-table">
@@ -101,25 +104,28 @@ unset($_SESSION['reserva_mensaje'], $_SESSION['reserva_tipo']);
                         <tbody>
                             <?php if (!empty($pedidosHistoricos)): ?>
                                 <?php foreach ($pedidosHistoricos as $pedido): ?>
-                                <tr>
-                                    <td><?= (int) $pedido['id']; ?></td>
-                                    <td><?= htmlspecialchars($pedido['producto'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                    <td><?= (int) $pedido['cantidad']; ?></td>
-                                    <td><?= htmlspecialchars(ucfirst($pedido['estado']), ENT_QUOTES, 'UTF-8'); ?></td>
-                                    <td><?= htmlspecialchars($pedido['fecha_formateada'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                </tr>
+                                    <tr>
+                                        <td><?= (int) $pedido['id']; ?></td>
+                                        <td><?= htmlspecialchars($pedido['producto'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td><?= htmlspecialchars($pedido['presentacion'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td><?= htmlspecialchars($pedido['color'] ?? '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td><?= (float) $pedido['cantidad']; ?></td>
+                                        <td>$<?= number_format($pedido['total'], 2); ?></td>
+                                        <td><?= htmlspecialchars(ucfirst($pedido['estado']), ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td><?= htmlspecialchars($pedido['fecha_formateada'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                    </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-4">Aquí aparecerá tu historial en cuanto completes tus primeros pedidos.</td>
+                                    <td colspan="8" class="text-center text-muted py-4">
+                                        Aquí aparecerá tu historial en cuanto completes tus primeros pedidos.
+                                    </td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
-            <?php else: ?>
-                <div class="alert alert-secondary" role="alert">Aquí aparecerá tu historial en cuanto completes tus primeros pedidos.</div>
-            <?php endif; ?>
+            </div>
         </div>
     </div>
 </main>

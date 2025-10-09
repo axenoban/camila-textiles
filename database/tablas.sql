@@ -15,7 +15,9 @@ CREATE TABLE productos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
     descripcion TEXT,
-    precio DECIMAL(10, 2) NOT NULL,
+    color VARCHAR(120) NOT NULL, -- Paleta cromática que identifica la tela
+    unidad_venta ENUM('metro', 'rollo') NOT NULL DEFAULT 'metro', -- Unidad comercial principal
+    precio DECIMAL(10, 2) NOT NULL, -- Precio expresado en bolivianos (Bs)
     imagen VARCHAR(255) NOT NULL,  -- Usamos URL externa para la imagen
     visible BOOLEAN DEFAULT TRUE,  -- Define si el producto es visible en el catálogo
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -25,7 +27,7 @@ CREATE TABLE productos (
 CREATE TABLE inventarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_producto INT NOT NULL,
-    cantidad INT NOT NULL,
+    cantidad DECIMAL(10, 2) NOT NULL, -- Control de stock expresado en la misma unidad de venta del producto
     FOREIGN KEY (id_producto) REFERENCES productos(id) ON DELETE CASCADE
 );
 
@@ -34,7 +36,8 @@ CREATE TABLE pedidos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
     id_producto INT NOT NULL,
-    cantidad INT NOT NULL,
+    cantidad DECIMAL(10, 2) NOT NULL,
+    unidad_venta ENUM('metro', 'rollo') NOT NULL DEFAULT 'metro', -- Registra si el pedido fue reservado por metro lineal o rollo
     estado ENUM('pendiente', 'confirmado', 'completado', 'cancelado') NOT NULL DEFAULT 'pendiente',
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id),

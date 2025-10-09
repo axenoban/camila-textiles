@@ -8,25 +8,25 @@ INSERT INTO usuarios (nombre, email, clave, rol) VALUES
 ('Pedro Martínez', 'pedro.martinez@outlook.com', 'cliente789', 'cliente');
 
 -- Insertar productos (productos disponibles para la venta)
-INSERT INTO productos (nombre, descripcion, precio, imagen, visible) VALUES
-('Tela Algodón', 'Tela de algodón de alta calidad para confección de ropa.', 25.50, 'https://via.placeholder.com/150', TRUE),
-('Tela Seda', 'Tela de seda ideal para vestidos de lujo.', 75.00, 'https://via.placeholder.com/150', TRUE),
-('Tela Lana', 'Tela gruesa de lana perfecta para chaquetas y abrigos.', 50.00, 'https://via.placeholder.com/150', TRUE),
-('Tela Lino', 'Tela de lino, fresca y cómoda para ropa veraniega.', 40.00, 'https://via.placeholder.com/150', TRUE);
+INSERT INTO productos (nombre, descripcion, color, unidad_venta, precio, imagen, visible) VALUES
+('Tela Algodón Peinado', 'Tejido plano 100% algodón, ideal para camisería y ropa casual.', 'Marfil', 'metro', 48.50, 'https://via.placeholder.com/150', TRUE),
+('Tela Seda Natural', 'Satín de seda con caída fluida para vestidos de alta costura.', 'Perla', 'metro', 182.90, 'https://via.placeholder.com/150', TRUE),
+('Tela Lana Merino', 'Paño de lana merino cardada, óptimo para abrigos y sacos ejecutivos.', 'Gris Oxford', 'rollo', 1240.00, 'https://via.placeholder.com/150', TRUE),
+('Tela Lino Premium', 'Lino europeo de tacto fresco para colecciones primavera/verano.', 'Arena', 'metro', 66.75, 'https://via.placeholder.com/150', TRUE);
 
 -- Insertar inventarios
 INSERT INTO inventarios (id_producto, cantidad) VALUES
-(1, 100),
-(2, 50),
-(3, 80),
-(4, 150);
+(1, 320.00),
+(2, 180.00),
+(3, 24.00),
+(4, 410.00);
 
 -- Insertar pedidos (pedidos realizados por los clientes)
-INSERT INTO pedidos (id_usuario, id_producto, cantidad, estado) VALUES
-(2, 1, 3, 'pendiente'),
-(3, 2, 2, 'confirmado'),
-(4, 3, 5, 'completado'),
-(2, 4, 10, 'pendiente');
+INSERT INTO pedidos (id_usuario, id_producto, cantidad, unidad_venta, estado) VALUES
+(2, 1, 45.00, 'metro', 'pendiente'),
+(3, 2, 18.50, 'metro', 'confirmado'),
+(4, 3, 3.00, 'rollo', 'completado'),
+(2, 4, 120.00, 'metro', 'pendiente');
 
 -- Insertar comentarios (comentarios realizados por los clientes sobre productos)
 INSERT INTO comentarios (id_producto, id_usuario, comentario) VALUES

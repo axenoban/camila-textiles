@@ -18,17 +18,24 @@
                                 <th>ID Pedido</th>
                                 <th>Producto</th>
                                 <th>Cantidad</th>
+                                <th>Unidad</th>
                                 <th>Estado</th>
                                 <th class="text-end">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($pedidosActivos as $pedido): ?>
+                                <?php
+                                    $producto = htmlspecialchars($pedido['producto'] ?? '', ENT_QUOTES, 'UTF-8');
+                                    $estado = htmlspecialchars($pedido['estado'] ?? '', ENT_QUOTES, 'UTF-8');
+                                    $unidad = isset($pedido['unidad_venta']) && $pedido['unidad_venta'] === 'rollo' ? 'Rollo' : 'Metro';
+                                ?>
                                 <tr>
                                     <td><?= $pedido['id'] ?></td>
-                                    <td><?= $pedido['producto'] ?></td>
-                                    <td><?= $pedido['cantidad'] ?></td>
-                                    <td><?= $pedido['estado'] ?></td>
+                                    <td><?= $producto ?></td>
+                                    <td><?= number_format($pedido['cantidad'], 2, ',', '.') ?></td>
+                                    <td><?= $unidad ?></td>
+                                    <td><?= $estado ?></td>
                                     <td class="text-end text-nowrap">
                                         <a href="ver_detalles_pedido.php?id=<?= $pedido['id'] ?>" class="btn btn-info btn-sm">Ver detalles</a>
                                     </td>
@@ -49,18 +56,26 @@
                                 <th>ID Pedido</th>
                                 <th>Producto</th>
                                 <th>Cantidad</th>
+                                <th>Unidad</th>
                                 <th>Estado</th>
                                 <th>Fecha</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($pedidosHistoricos as $pedido): ?>
+                                <?php
+                                    $producto = htmlspecialchars($pedido['producto'] ?? '', ENT_QUOTES, 'UTF-8');
+                                    $estado = htmlspecialchars($pedido['estado'] ?? '', ENT_QUOTES, 'UTF-8');
+                                    $fecha = htmlspecialchars($pedido['fecha'] ?? '', ENT_QUOTES, 'UTF-8');
+                                    $unidad = isset($pedido['unidad_venta']) && $pedido['unidad_venta'] === 'rollo' ? 'Rollo' : 'Metro';
+                                ?>
                                 <tr>
                                     <td><?= $pedido['id'] ?></td>
-                                    <td><?= $pedido['producto'] ?></td>
-                                    <td><?= $pedido['cantidad'] ?></td>
-                                    <td><?= $pedido['estado'] ?></td>
-                                    <td><?= $pedido['fecha'] ?></td>
+                                    <td><?= $producto ?></td>
+                                    <td><?= number_format($pedido['cantidad'], 2, ',', '.') ?></td>
+                                    <td><?= $unidad ?></td>
+                                    <td><?= $estado ?></td>
+                                    <td><?= $fecha ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

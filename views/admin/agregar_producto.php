@@ -21,8 +21,19 @@
                             <textarea class="form-control" id="descripcion" name="descripcion" rows="4" required></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label for="precio" class="form-label">Precio (USD)</label>
-                            <input type="number" class="form-control" id="precio" name="precio" step="0.01" required>
+                            <label for="color" class="form-label">Color predominante</label>
+                            <input type="text" class="form-control" id="color" name="color" placeholder="Ej. Azul petróleo" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="unidad_venta" class="form-label">Unidad de venta</label>
+                            <select class="form-select" id="unidad_venta" name="unidad_venta" required>
+                                <option value="metro">Metro lineal</option>
+                                <option value="rollo">Rollo completo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="precio" class="form-label">Precio (Bs)</label>
+                            <input type="number" class="form-control" id="precio" name="precio" step="0.01" min="0" required>
                         </div>
                         <div class="col-md-6">
                             <label for="imagen" class="form-label">URL de imagen</label>

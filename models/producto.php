@@ -24,19 +24,34 @@ class Producto {
     }
 
     // Método para agregar un nuevo producto
-    public function agregarProducto($nombre, $descripcion, $precio, $imagen) {
+    public function agregarProducto($nombre, $descripcion, $color, $unidadVenta, $precio, $imagen) {
         global $pdo;
 
-        $stmt = $pdo->prepare("INSERT INTO productos (nombre, descripcion, precio, imagen) VALUES (:nombre, :descripcion, :precio, :imagen)");
-        return $stmt->execute(['nombre' => $nombre, 'descripcion' => $descripcion, 'precio' => $precio, 'imagen' => $imagen]);
+        $stmt = $pdo->prepare("INSERT INTO productos (nombre, descripcion, color, unidad_venta, precio, imagen) VALUES (:nombre, :descripcion, :color, :unidad_venta, :precio, :imagen)");
+        return $stmt->execute([
+            'nombre' => $nombre,
+            'descripcion' => $descripcion,
+            'color' => $color,
+            'unidad_venta' => $unidadVenta,
+            'precio' => $precio,
+            'imagen' => $imagen
+        ]);
     }
 
     // Método para editar un producto
-    public function editarProducto($id, $nombre, $descripcion, $precio, $imagen) {
+    public function editarProducto($id, $nombre, $descripcion, $color, $unidadVenta, $precio, $imagen) {
         global $pdo;
 
-        $stmt = $pdo->prepare("UPDATE productos SET nombre = :nombre, descripcion = :descripcion, precio = :precio, imagen = :imagen WHERE id = :id");
-        return $stmt->execute(['id' => $id, 'nombre' => $nombre, 'descripcion' => $descripcion, 'precio' => $precio, 'imagen' => $imagen]);
+        $stmt = $pdo->prepare("UPDATE productos SET nombre = :nombre, descripcion = :descripcion, color = :color, unidad_venta = :unidad_venta, precio = :precio, imagen = :imagen WHERE id = :id");
+        return $stmt->execute([
+            'id' => $id,
+            'nombre' => $nombre,
+            'descripcion' => $descripcion,
+            'color' => $color,
+            'unidad_venta' => $unidadVenta,
+            'precio' => $precio,
+            'imagen' => $imagen
+        ]);
     }
 
     // Método para eliminar un producto

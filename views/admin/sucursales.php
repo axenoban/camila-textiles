@@ -10,6 +10,22 @@ $sucursales = $sucursalModel->obtenerSucursales();
 
 <main class="main-wrapper">
     <div class="container-fluid px-4 px-lg-5">
+        <?php
+        $status = $_GET['status'] ?? null;
+        $mensajes = [
+            'creado' => ['type' => 'success', 'text' => 'La sucursal se registró exitosamente.'],
+            'actualizado' => ['type' => 'success', 'text' => 'La información de la sucursal se actualizó.'],
+            'eliminado' => ['type' => 'success', 'text' => 'La sucursal se eliminó.'],
+            'no_encontrado' => ['type' => 'warning', 'text' => 'La sucursal indicada no existe.'],
+            'error' => ['type' => 'danger', 'text' => 'No se pudo completar la operación.'],
+        ];
+
+        if ($status && isset($mensajes[$status])): ?>
+        <div class="alert alert-<?= $mensajes[$status]['type']; ?> alert-dismissible fade show" role="alert">
+            <?= htmlspecialchars($mensajes[$status]['text'], ENT_QUOTES, 'UTF-8'); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+        <?php endif; ?>
         <header class="page-header text-center text-lg-start">
             <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                 <div>

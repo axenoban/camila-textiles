@@ -10,6 +10,22 @@ $empleados = $empleadoModel->obtenerEmpleados();
 
 <main class="main-wrapper">
     <div class="container-fluid px-4 px-lg-5">
+        <?php
+        $status = $_GET['status'] ?? null;
+        $mensajes = [
+            'creado' => ['type' => 'success', 'text' => 'El empleado se registró correctamente.'],
+            'actualizado' => ['type' => 'success', 'text' => 'Los datos del empleado se actualizaron.'],
+            'eliminado' => ['type' => 'success', 'text' => 'El empleado se eliminó del sistema.'],
+            'no_encontrado' => ['type' => 'warning', 'text' => 'El empleado solicitado no existe.'],
+            'error' => ['type' => 'danger', 'text' => 'No se pudo completar la operación. Inténtalo nuevamente.'],
+        ];
+
+        if ($status && isset($mensajes[$status])): ?>
+        <div class="alert alert-<?= $mensajes[$status]['type']; ?> alert-dismissible fade show" role="alert">
+            <?= htmlspecialchars($mensajes[$status]['text'], ENT_QUOTES, 'UTF-8'); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+        <?php endif; ?>
         <header class="page-header text-center text-lg-start">
             <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                 <div>

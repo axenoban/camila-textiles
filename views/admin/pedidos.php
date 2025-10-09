@@ -37,26 +37,7 @@ $pedidos = $pedidoModel->obtenerTodosLosPedidos();
                                 <td><?= (int) $pedido['id']; ?></td>
                                 <td><?= htmlspecialchars($pedido['cliente'], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td><?= htmlspecialchars($pedido['producto'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?= htmlspecialchars(ucfirst($pedido['presentacion_tipo'] ?? $pedido['unidad'] ?? 'metro'), ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td>
-                                    <span class="badge-soft"><?= htmlspecialchars($pedido['color_nombre'] ?? 'A confirmar', ENT_QUOTES, 'UTF-8'); ?></span>
-                                </td>
-                                <td>
-                                    <?php
-                                        $cantidad = (int) ($pedido['cantidad'] ?? 0);
-                                        $unidad = $pedido['unidad'] ?? ($pedido['presentacion_tipo'] ?? 'metro');
-                                        $metrosUnidad = (int) round($pedido['metros_por_unidad'] ?? 0);
-                                        if ($unidad === 'rollo' && $cantidad > 0) {
-                                            echo htmlspecialchars($cantidad . ' ' . ($cantidad === 1 ? 'rollo' : 'rollos'), ENT_QUOTES, 'UTF-8');
-                                            if ($metrosUnidad > 0) {
-                                                echo htmlspecialchars(' · ' . $metrosUnidad . ' m c/u', ENT_QUOTES, 'UTF-8');
-                                            }
-                                        } else {
-                                            echo htmlspecialchars($cantidad . ' ' . ($cantidad === 1 ? 'metro' : 'metros'), ENT_QUOTES, 'UTF-8');
-                                        }
-                                    ?>
-                                </td>
-                                <td>$<?= number_format((float) ($pedido['total'] ?? 0), 2); ?></td>
+                                <td><?= (int) $pedido['cantidad']; ?></td>
                                 <td>
                                     <span class="status-pill status-<?= htmlspecialchars($pedido['estado'], ENT_QUOTES, 'UTF-8'); ?>">
                                         <?= htmlspecialchars(ucfirst($pedido['estado']), ENT_QUOTES, 'UTF-8'); ?>
@@ -70,7 +51,7 @@ $pedidos = $pedidoModel->obtenerTodosLosPedidos();
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="9" class="text-center text-muted py-4">No hay pedidos registrados en este momento.</td>
+                                <td colspan="6" class="text-center text-muted py-4">No hay pedidos registrados en este momento.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

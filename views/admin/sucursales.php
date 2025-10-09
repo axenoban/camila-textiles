@@ -59,7 +59,7 @@ $sucursales = $sucursalModel->obtenerSucursales();
                                 <td><?= htmlspecialchars($sucursal['horario_apertura'], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td class="text-end text-nowrap">
                                     <a href="editar_sucursal.php?id=<?= (int) $sucursal['id']; ?>" class="btn btn-warning btn-sm me-2">Editar</a>
-                                    <a href="<?= BASE_URL ?>/controllers/sucursales.php?accion=eliminar&amp;id=<?= (int) $sucursal['id']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
+                                    <a href="eliminar_sucursal.php?id=<?= (int) $sucursal['id']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
                                 </td>
                             </tr>
                             <?php endforeach; ?>

@@ -9,24 +9,7 @@ class Pedido {
     public function obtenerPedidosPorCliente($idUsuario) {
         global $pdo;
 
-        $sql = "
-            SELECT 
-                p.*, 
-                pr.nombre AS producto,
-                pr.imagen,
-                pc.nombre AS color_nombre,
-                pc.codigo_hex,
-                pp.tipo AS presentacion_tipo,
-                pp.metros_por_unidad
-            FROM pedidos p
-            INNER JOIN productos pr ON p.id_producto = pr.id
-            LEFT JOIN producto_colores pc ON p.id_color = pc.id
-            LEFT JOIN producto_presentaciones pp ON p.id_presentacion = pp.id
-            WHERE p.id_usuario = :id_usuario
-            ORDER BY p.fecha_creacion DESC
-        ";
-
-        $stmt = $pdo->prepare($sql);
+        $stmt = $pdo->prepare("SELECT p.*, pr.nombre AS producto, pr.precio FROM pedidos p INNER JOIN productos pr ON p.id_producto = pr.id WHERE p.id_usuario = :id_usuario ORDER BY p.fecha_creacion DESC");
         $stmt->execute(['id_usuario' => (int) $idUsuario]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -109,20 +92,15 @@ class Pedido {
         return $stmt->execute(['id' => $id]);
     }
 
-    public function crearPedido($idUsuario, $idProducto, $idColor, $idPresentacion, $cantidad, $unidad, $precioUnitario, $total) {
+    public function crearPedido($idUsuario, $idProducto, $cantidad) {
         global $pdo;
 
-        $stmt = $pdo->prepare("INSERT INTO pedidos (id_usuario, id_producto, id_color, id_presentacion, cantidad, unidad, precio_unitario, total, estado) VALUES (:id_usuario, :id_producto, :id_color, :id_presentacion, :cantidad, :unidad, :precio_unitario, :total, 'pendiente')");
+        $stmt = $pdo->prepare("INSERT INTO pedidos (id_usuario, id_producto, cantidad, estado) VALUES (:id_usuario, :id_producto, :cantidad, 'pendiente')");
 
         return $stmt->execute([
             'id_usuario' => (int) $idUsuario,
             'id_producto' => (int) $idProducto,
-            'id_color' => $idColor !== null ? (int) $idColor : null,
-            'id_presentacion' => $idPresentacion !== null ? (int) $idPresentacion : null,
-            'cantidad' => (float) $cantidad,
-            'unidad' => $unidad,
-            'precio_unitario' => (float) $precioUnitario,
-            'total' => (float) $total,
+            'cantidad' => (int) $cantidad,
         ]);
     }
 }

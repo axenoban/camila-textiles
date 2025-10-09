@@ -9,10 +9,10 @@
             <div class="col-md-4">
                 <h6 class="footer-heading">Enlaces rápidos</h6>
                 <ul class="list-unstyled footer-links">
-                    <li><a href="/camila-textil/views/public/index.php">Inicio</a></li>
-                    <li><a href="/camila-textil/views/public/productos.php">Catálogo</a></li>
-                    <li><a href="/camila-textil/views/public/acerca.php">Nosotros</a></li>
-                    <li><a href="/camila-textil/views/public/contacto.php">Contacto</a></li>
+                    <li><a href="<?= BASE_URL ?>/views/public/index.php">Inicio</a></li>
+                    <li><a href="<?= BASE_URL ?>/views/public/productos.php">Catálogo</a></li>
+                    <li><a href="<?= BASE_URL ?>/views/public/acerca.php">Nosotros</a></li>
+                    <li><a href="<?= BASE_URL ?>/views/public/contacto.php">Contacto</a></li>
                 </ul>
             </div>
             <div class="col-md-4">
@@ -37,5 +37,13 @@
     </div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.alert[data-auto-dismiss="true"]').forEach(alertEl => {
+            const instance = bootstrap.Alert.getOrCreateInstance(alertEl);
+            setTimeout(() => instance.close(), 3000);
+        });
+    });
+</script>
 </body>
 </html>

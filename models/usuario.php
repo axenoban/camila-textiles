@@ -6,11 +6,11 @@ require_once __DIR__ . '/../database/conexion.php';
 class Usuario {
 
     // Método para autenticar un usuario
-    public function autenticarUsuario($email, $clave) {
+    public function autenticarUsuario($identificador, $clave) {
         global $pdo;
-        
-        $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = :email");
-        $stmt->execute(['email' => $email]);
+
+        $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = :identificador OR nombre = :identificador LIMIT 1");
+        $stmt->execute(['identificador' => $identificador]);
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($usuario) {
@@ -57,6 +57,26 @@ class Usuario {
         $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = :id");
         $stmt->execute(['id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function actualizarPerfil($id, $nombre, $email, $clave = null) {
+        global $pdo;
+
+        $datos = [
+            'id' => $id,
+            'nombre' => $nombre,
+            'email' => $email,
+        ];
+
+        $set = 'nombre = :nombre, email = :email';
+
+        if ($clave !== null) {
+            $datos['clave'] = password_hash($clave, PASSWORD_BCRYPT);
+            $set .= ', clave = :clave';
+        }
+
+        $stmt = $pdo->prepare("UPDATE usuarios SET $set WHERE id = :id");
+        return $stmt->execute($datos);
     }
 
     // Método para crear un nuevo usuario

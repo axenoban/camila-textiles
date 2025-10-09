@@ -20,7 +20,7 @@
                     <li class="nav-item"><a class="nav-link" href="reportes.php"><i class="bi bi-bar-chart-line me-2"></i>Reportes</a></li>
                 </ul>
                 <div class="ms-lg-4 mt-3 mt-lg-0 d-flex align-items-center gap-3">
-                    <span class="badge-user"><i class="bi bi-person-circle me-2"></i>Administrador</span>
+                    <span class="badge-user"><i class="bi bi-person-circle me-2"></i><?= htmlspecialchars($_SESSION['usuario']['nombre'] ?? 'Administrador', ENT_QUOTES, 'UTF-8'); ?></span>
                     <a class="btn btn-outline-light rounded-pill px-4" href="<?= BASE_URL ?>/controllers/logout.php">Cerrar sesión</a>
                 </div>
             </div>

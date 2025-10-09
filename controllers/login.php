@@ -13,12 +13,13 @@ class LoginController {
 
     public function autenticar() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $usuario = $_POST['usuario'] ?? $_POST['email'] ?? '';
-            $clave = $_POST['clave'];
+            $usuario = trim($_POST['usuario'] ?? $_POST['email'] ?? '');
+            $clave = $_POST['clave'] ?? '';
             $usuarioModel = new Usuario();
             $resultado = $usuarioModel->autenticarUsuario($usuario, $clave);
 
             if ($resultado) {
+                session_regenerate_id(true);
                 $_SESSION['usuario'] = [
                     'id' => $resultado['id'],
                     'nombre' => $resultado['nombre'],
@@ -26,10 +27,15 @@ class LoginController {
                     'rol' => $resultado['rol'],
                 ];
                 $_SESSION['rol'] = $resultado['rol'];
-                header('Location: ' . BASE_URL . '/index.php');
+                $destino = $resultado['rol'] === 'administrador'
+                    ? BASE_URL . '/views/admin/dashboard.php'
+                    : BASE_URL . '/views/cliente/dashboard.php';
+                header('Location: ' . $destino);
                 exit;
             } else {
-                echo "Credenciales incorrectas";
+                $_SESSION['error_login'] = 'Las credenciales no coinciden con nuestros registros.';
+                header('Location: ' . BASE_URL . '/views/public/login.php');
+                exit;
             }
         }
     }

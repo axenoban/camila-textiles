@@ -1,5 +1,9 @@
 -- tablas.sql
 
+-- Crear y seleccionar la base de datos que utiliza la aplicación
+CREATE DATABASE IF NOT EXISTS camila_textil CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE camila_textil;
+
 -- Crear la tabla de usuarios (clientes y administradores)
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,

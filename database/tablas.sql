@@ -91,25 +91,16 @@ CREATE TABLE pedidos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
     id_producto INT NOT NULL,
-    total DECIMAL(12,2) NOT NULL DEFAULT 0,
-    notas TEXT,
-    estado ENUM('pendiente','confirmado','completado','cancelado') NOT NULL DEFAULT 'pendiente',
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (id_producto) REFERENCES productos(id) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Tabla: pedido_detalles
-CREATE TABLE pedido_detalles (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    id_pedido INT NOT NULL,
-    id_color INT NOT NULL,
-    id_presentacion INT NOT NULL,
+    id_color INT DEFAULT NULL,
+    id_presentacion INT DEFAULT NULL,
     cantidad DECIMAL(10,2) NOT NULL,
     unidad ENUM('rollo','metro') NOT NULL DEFAULT 'metro',
     precio_unitario DECIMAL(10,2) NOT NULL DEFAULT 0,
-    subtotal DECIMAL(12,2) NOT NULL DEFAULT 0,
-    FOREIGN KEY (id_pedido) REFERENCES pedidos(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    total DECIMAL(12,2) NOT NULL DEFAULT 0,
+    estado ENUM('pendiente','confirmado','completado','cancelado') NOT NULL DEFAULT 'pendiente',
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_producto) REFERENCES productos(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (id_color) REFERENCES producto_colores(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (id_presentacion) REFERENCES producto_presentaciones(id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -165,8 +156,8 @@ INSERT INTO productos (id, nombre, descripcion, precio, imagen, visible) VALUES
 
 -- Inventarios
 INSERT INTO inventarios (id, id_producto, cantidad) VALUES
-(1, 1, 2480),
-(2, 2, 2640),
+(1, 1, 0),
+(2, 2, 0),
 (3, 3, 320),
 (4, 4, 150),
 (5, 5, 420),
@@ -207,20 +198,13 @@ INSERT INTO producto_existencias (id, id_producto, id_color, id_presentacion, st
 (14, 2, 7, 4, 710);
 
 -- Pedidos
-INSERT INTO pedidos (id, id_usuario, id_producto, total, estado) VALUES
-(1, 2, 1, 4200.00, 'pendiente'),
-(2, 3, 2, 3033.00, 'confirmado'),
-(3, 2, 2, 2835.00, 'pendiente'),
-(4, 3, 1, 7110.00, 'completado');
-
--- Detalles de pedidos
-INSERT INTO pedido_detalles (id, id_pedido, id_color, id_presentacion, cantidad, unidad, precio_unitario, subtotal) VALUES
-(1, 1, 2, 1, 2, 'rollo', 915.00, 1830.00),
-(2, 1, 3, 2, 60, 'metro', 39.50, 2370.00),
-(3, 2, 6, 4, 60, 'metro', 34.80, 2088.00),
-(4, 2, 7, 3, 1, 'rollo', 945.00, 945.00),
-(5, 3, 5, 3, 3, 'rollo', 945.00, 2835.00),
-(6, 4, 4, 2, 180, 'metro', 39.50, 7110.00);
+INSERT INTO pedidos (id, id_usuario, id_producto, id_color, id_presentacion, cantidad, unidad, precio_unitario, total, estado) VALUES
+(1, 2, 1, 2, 1, 2, 'rollo', 915.00, 1830.00, 'pendiente'),
+(2, 3, 2, 6, 4, 60, 'metro', 34.80, 2088.00, 'confirmado'),
+(3, 2, 3, NULL, NULL, 150, 'metro', 42.00, 6300.00, 'confirmado'),
+(4, 3, 4, NULL, NULL, 120, 'metro', 57.40, 6888.00, 'pendiente'),
+(5, 2, 2, 5, 3, 3, 'rollo', 945.00, 2835.00, 'pendiente'),
+(6, 3, 1, 4, 2, 180, 'metro', 39.50, 7110.00, 'completado');
 
 -- Comentarios
 INSERT INTO comentarios (id, id_producto, id_usuario, comentario) VALUES

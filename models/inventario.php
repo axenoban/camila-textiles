@@ -38,7 +38,7 @@ class Inventario {
         $stmt->execute(['id_producto' => (int) $idProducto]);
         $cantidad = $stmt->fetchColumn();
 
-        return $cantidad !== false ? (float) $cantidad : 0.0;
+        return $cantidad !== false ? (int) $cantidad : 0;
     }
 
     // Método para agregar un producto al inventario
@@ -62,7 +62,7 @@ class Inventario {
 
         $stmt = $pdo->prepare('UPDATE inventarios SET cantidad = GREATEST(cantidad - :cantidad, 0) WHERE id_producto = :id_producto');
         return $stmt->execute([
-            'cantidad' => (float) $cantidad,
+            'cantidad' => (int) $cantidad,
             'id_producto' => (int) $idProducto,
         ]);
     }

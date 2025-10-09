@@ -23,24 +23,6 @@ $productos = $productoModel->obtenerProductosVisibles();
                 </div>
             </div>
             <div class="product-grid">
-                <?php foreach ($productos as $producto): ?>
-                    <article class="product-card">
-                        <img src="<?= $producto['imagen'] ?>" alt="<?= $producto['nombre'] ?>">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <h5 class="card-title mb-0"><?= $producto['nombre'] ?></h5>
-                                <span class="product-price">$<?= number_format($producto['precio'], 2) ?></span>
-                            </div>
-                            <p class="card-text mb-4"><?= $producto['descripcion'] ?></p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="badge-soft">Stock garantizado</span>
-                                <a href="/camila-textil/views/cliente/productos.php" class="btn btn-primary">Reservar</a>
-                            </div>
-                        </div>
-                    </article>
-                <?php endforeach; ?>
-            </div>
-            <div class="product-grid">
                 <?php if (!empty($productos)): ?>
                     <?php foreach ($productos as $producto): ?>
                         <article class="product-card">
@@ -48,12 +30,14 @@ $productos = $productoModel->obtenerProductosVisibles();
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <h5 class="card-title mb-0"><?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8'); ?></h5>
-                                    <span class="product-price">$<?= number_format($producto['precio'], 2) ?></span>
+                                    <span class="product-price">$<?= number_format($producto['precio_desde'] ?? $producto['precio'], 2) ?></span>
                                 </div>
                                 <p class="card-text mb-4"><?= htmlspecialchars($producto['descripcion'], ENT_QUOTES, 'UTF-8'); ?></p>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="badge-soft">Stock garantizado</span>
-                                    <a href="<?= BASE_URL ?>/views/cliente/productos.php" class="btn btn-primary">Reservar</a>
+                                    <span class="badge-soft <?= ($producto['stock'] ?? 0) > 0 ? 'text-success' : 'text-danger'; ?>">
+                                        <?= ($producto['stock'] ?? 0) > 0 ? 'Disponible' : 'Agotado'; ?>
+                                    </span>
+                                    <a href="<?= BASE_URL ?>/views/public/login.php" class="btn btn-primary">Reservar</a>
                                 </div>
                             </div>
                         </article>

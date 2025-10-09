@@ -11,7 +11,8 @@
         <div class="row justify-content-center">
             <div class="col-12 col-xl-7">
                 <div class="form-shell">
-                    <form action="empleados.php" method="POST" class="row g-4">
+                    <form action="<?= BASE_URL ?>/controllers/empleados.php" method="POST" class="row g-4">
+                        <input type="hidden" name="accion" value="crear">
                         <div class="col-12">
                             <label for="nombre" class="form-label">Nombre del empleado</label>
                             <input type="text" class="form-control" id="nombre" name="nombre" required>

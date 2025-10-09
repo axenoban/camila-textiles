@@ -119,14 +119,10 @@ CREATE TABLE sucursales (
 -- Datos de ejemplo realistas
 
 -- Usuarios (un administrador y dos clientes)
--- Las contraseñas en texto plano son:
---   Administrador: AdminCamila2024!
---   Lucía Fernández: ClienteLuz#1
---   Marcos Delgado: ClienteMarcos#1
-INSERT INTO usuarios (nombre, email, clave, rol) VALUES
-('Camila Rivas', 'admin@camilatextiles.com', '$2y$12$uDAkRi3woqTwT3QC2dizwuIagONG3kbZ5YA2G4D0fRUv3KEeXe2LS', 'administrador'),
-('Lucía Fernández', 'lucia.fernandez@example.com', '$2y$12$3jhMOzbJIBSUFRt1uAd97.sZ2QjCPeUvKLg5IevmWr.6XN2GiJGuK', 'cliente'),
-('Marcos Delgado', 'marcos.delgado@example.com', '$2y$12$PRbyvWM4DMBUF7fVIM72d.At88famT7P4PQdmxWwXqLImlUHf5pL2', 'cliente');
+I0N0S0E0R0T0 0I0N0T0O0 0u0s0u0a0r0i0o0s0 0(0n0o0m0b0r0e0,0 0e0m0a0i0l0,0 0c0l0a0v0e0,0 0r0o0l0)0 0V0A0L0U0E0S0
+0(0'0C0a0m0i0l0a0 0R0i0v0a0s0'0,0 0'0a0d0m0i0n0@0c0a0m0i0l0a0t0e0x0t0i0l0e0s0.0c0o0m0'0,0 0'0$020y$12$IZg2ygBFt728hSrSVFfVEeyllnPpCrPHKle5pUs9mw5fgfOFTJ3x.', 'administrador'),
+('Lucía Fernández', 'lucia.fernandez@example.com', '$2y$12$COytam4/33Irk1uUJ8UCLOnvtZHLxdWOmEa0RYgI7wd3e7j0TmsUW', 'cliente'),
+('Marcos Delgado', 'marcos.delgado@example.com', '$2y$12$HhptmQQo1zLJDjUJeE2HVuzNh4h19ngGZE1ftgZ8Rd62X.qxq5XSy', 'cliente');
 
 -- Productos textiles con imágenes externas para el catálogo
 INSERT INTO productos (nombre, descripcion, precio, imagen, visible) VALUES
@@ -135,9 +131,7 @@ INSERT INTO productos (nombre, descripcion, precio, imagen, visible) VALUES
 ('Bolso de Yute Eco Chic', 'Bolso tote de yute reforzado con asas de cuero vegano, ideal para compras sostenibles.', 89.90, 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80', TRUE),
 ('Camisa de Lino Premium', 'Camisa de lino orgánico con botones de coco, fresca y elegante para eventos de verano.', 139.00, 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80', TRUE),
 ('Alfombra Artesanal Arequipeña', 'Alfombra tejida en telar artesanal con lana merino, tonos tierra para ambientes cálidos.', 329.00, 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80', TRUE),
-('Camino de Mesa Bordado', 'Camino de mesa bordado a mano con flores andinas, ideal para resaltar mesas de comedor.', 74.50, 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=900&q=80', TRUE),
-('Tela Morley Premium para Blusas', 'Tejido acanalado importado con alto rebote y suavidad, ideal para blusas ajustadas y básicos de moda.', 39.50, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80', TRUE),
-('Tela Baby Rib Importada', 'Algodón peinado con elasticidad bidireccional que realza camisetas y bodies de alta rotación.', 34.80, 'https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&w=900&q=80', TRUE);
+('Camino de Mesa Bordado', 'Camino de mesa bordado a mano con flores andinas, ideal para resaltar mesas de comedor.', 74.50, 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=900&q=80', TRUE);
 
 -- Inventario disponible por producto
 INSERT INTO inventarios (id_producto, cantidad) VALUES
@@ -146,52 +140,14 @@ INSERT INTO inventarios (id_producto, cantidad) VALUES
 (3, 60),
 (4, 42),
 (5, 18),
-(6, 55),
-(7, 930),
-(8, 900);
-
--- Colores disponibles para las telas técnicas
-INSERT INTO producto_colores (id_producto, nombre, codigo_hex, imagen_muestra, descripcion) VALUES
-(7, 'Crema vainilla', '#F3E5D8', 'https://images.unsplash.com/photo-1551232864-3f0890e580d4?auto=format&fit=crop&w=600&q=80', 'Matiz neutro que realza prendas minimalistas y colecciones resort.'),
-(7, 'Negro grafito', '#1F1F1F', 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80', 'Clásico atemporal que resiste el uso continuo sin perder color.'),
-(7, 'Verde olivo', '#556B2F', 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80', 'Tono orgánico con matiz militar que funciona para colecciones cápsula y athleisure.'),
-(7, 'Rosa empolvado', '#F6D1C1', 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=600&q=80', 'Color femenino con alto movimiento en blusas y tops para retail.'),
-(8, 'Azul petróleo', '#1F3C5A', 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80', 'Color corporate ideal para uniformes y líneas casual premium.'),
-(8, 'Terracota desértica', '#C26841', 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=600&q=80', 'Matiz cálido que conecta con colecciones boho y urbanas.'),
-(8, 'Blanco perla', '#F9F7F2', 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80', 'Básico esencial para líneas de lencería y prendas de bebé.');
-
--- Presentaciones comerciales por producto
-INSERT INTO producto_presentaciones (id_producto, tipo, metros_por_unidad, precio) VALUES
-(7, 'rollo', 25.00, 890.00),
-(7, 'metro', 1.00, 39.50),
-(8, 'rollo', 30.00, 960.00),
-(8, 'metro', 1.00, 34.80);
-
--- Existencias por variación (color + presentación)
-INSERT INTO producto_existencias (id_producto, id_color, id_presentacion, stock) VALUES
-(7, 1, 1, 6),
-(7, 1, 2, 180),
-(7, 2, 1, 5),
-(7, 2, 2, 150),
-(7, 3, 1, 3),
-(7, 3, 2, 120),
-(7, 4, 1, 2),
-(7, 4, 2, 80),
-(8, 5, 3, 4),
-(8, 5, 4, 210),
-(8, 6, 3, 5),
-(8, 6, 4, 140),
-(8, 7, 3, 4),
-(8, 7, 4, 160);
+(6, 55);
 
 -- Pedidos registrados por los clientes
-INSERT INTO pedidos (id_usuario, id_producto, id_color, id_presentacion, cantidad, unidad, precio_unitario, total, estado) VALUES
-(2, 1, NULL, NULL, 1, 'metro', 249.90, 249.90, 'confirmado'),
-(2, 3, NULL, NULL, 2, 'metro', 89.90, 179.80, 'pendiente'),
-(3, 2, NULL, NULL, 1, 'metro', 189.50, 189.50, 'completado'),
-(3, 6, NULL, NULL, 3, 'metro', 74.50, 223.50, 'pendiente'),
-(2, 7, 2, 1, 2, 'rollo', 890.00, 1780.00, 'pendiente'),
-(3, 8, 7, 4, 40, 'metro', 34.80, 1392.00, 'confirmado');
+INSERT INTO pedidos (id_usuario, id_producto, cantidad, estado) VALUES
+(2, 1, 1, 'confirmado'),
+(2, 3, 2, 'pendiente'),
+(3, 2, 1, 'completado'),
+(3, 6, 3, 'pendiente');
 
 -- Comentarios visibles en el detalle de productos
 INSERT INTO comentarios (id_producto, id_usuario, comentario) VALUES

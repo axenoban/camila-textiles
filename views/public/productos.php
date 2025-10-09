@@ -33,14 +33,11 @@ $productos = $productoModel->obtenerProductosVisibles();
                                     <span class="product-price">$<?= number_format($producto['precio_desde'] ?? $producto['precio'], 2) ?></span>
                                 </div>
                                 <p class="card-text mb-4"><?= htmlspecialchars($producto['descripcion'], ENT_QUOTES, 'UTF-8'); ?></p>
-                                <div class="d-flex flex-column gap-2">
-                                    <span class="badge-soft <?= ($producto['stock'] ?? 0) > 0 ? 'text-success' : 'text-danger'; ?>">
-                                        <?= ($producto['stock'] ?? 0) > 0 ? 'Disponible' : 'Agotado'; ?>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge-soft <?= ($producto['stock'] ?? 0) > 0 ? '' : 'text-danger'; ?>">
+                                        <?= ($producto['stock'] ?? 0) > 0 ? 'Stock disponible: ' . (int) $producto['stock'] : 'Sin stock en este momento'; ?>
                                     </span>
-                                    <div class="d-flex flex-wrap gap-2">
-                                        <a href="<?= BASE_URL ?>/views/public/detalle_producto.php?id=<?= (int) $producto['id']; ?>" class="btn btn-outline-primary">Ver detalles</a>
-                                        <a href="<?= BASE_URL ?>/views/public/login.php" class="btn btn-primary">Reservar</a>
-                                    </div>
+                                    <a href="<?= BASE_URL ?>/views/cliente/productos.php" class="btn btn-primary">Reservar</a>
                                 </div>
                             </div>
                         </article>

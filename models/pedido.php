@@ -18,7 +18,24 @@ class Pedido {
     public function obtenerTodosLosPedidos() {
         global $pdo;
 
-        $stmt = $pdo->prepare("SELECT p.*, u.nombre AS cliente, pr.nombre AS producto, pr.precio FROM pedidos p INNER JOIN usuarios u ON p.id_usuario = u.id INNER JOIN productos pr ON p.id_producto = pr.id ORDER BY p.fecha_creacion DESC");
+        $sql = "
+            SELECT 
+                p.*, 
+                u.nombre AS cliente, 
+                pr.nombre AS producto,
+                pc.nombre AS color_nombre,
+                pc.codigo_hex,
+                pp.tipo AS presentacion_tipo,
+                pp.metros_por_unidad
+            FROM pedidos p
+            INNER JOIN usuarios u ON p.id_usuario = u.id
+            INNER JOIN productos pr ON p.id_producto = pr.id
+            LEFT JOIN producto_colores pc ON p.id_color = pc.id
+            LEFT JOIN producto_presentaciones pp ON p.id_presentacion = pp.id
+            ORDER BY p.fecha_creacion DESC
+        ";
+
+        $stmt = $pdo->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -47,7 +64,7 @@ class Pedido {
     public function calcularIngresosTotales() {
         global $pdo;
 
-        $stmt = $pdo->query("SELECT COALESCE(SUM(pr.precio * p.cantidad), 0) FROM pedidos p INNER JOIN productos pr ON p.id_producto = pr.id WHERE p.estado IN ('pendiente', 'confirmado', 'completado')");
+        $stmt = $pdo->query("SELECT COALESCE(SUM(p.total), 0) FROM pedidos p WHERE p.estado IN ('pendiente', 'confirmado', 'completado')");
         return (float) $stmt->fetchColumn();
     }
 

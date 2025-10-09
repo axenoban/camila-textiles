@@ -22,7 +22,10 @@ $pedidos = $pedidoModel->obtenerTodosLosPedidos();
                             <th>ID Pedido</th>
                             <th>Cliente</th>
                             <th>Producto</th>
+                            <th>Presentación</th>
+                            <th>Color</th>
                             <th>Cantidad</th>
+                            <th>Total</th>
                             <th>Estado</th>
                             <th class="text-end">Acciones</th>
                         </tr>

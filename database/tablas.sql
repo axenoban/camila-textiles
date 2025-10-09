@@ -33,16 +33,57 @@ CREATE TABLE inventarios (
     FOREIGN KEY (id_producto) REFERENCES productos(id) ON DELETE CASCADE
 );
 
+-- Catálogo de colores específicos por producto
+CREATE TABLE producto_colores (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_producto INT NOT NULL,
+    nombre VARCHAR(120) NOT NULL,
+    codigo_hex CHAR(7) DEFAULT NULL,
+    imagen_muestra VARCHAR(255) DEFAULT NULL,
+    descripcion TEXT DEFAULT NULL,
+    FOREIGN KEY (id_producto) REFERENCES productos(id) ON DELETE CASCADE
+);
+
+-- Presentaciones comerciales (por metro, por rollo, etc.) con su precio
+CREATE TABLE producto_presentaciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_producto INT NOT NULL,
+    tipo ENUM('rollo', 'metro') NOT NULL,
+    metros_por_unidad DECIMAL(10, 2) DEFAULT NULL,
+    precio DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (id_producto) REFERENCES productos(id) ON DELETE CASCADE
+);
+
+-- Existencias por combinación de color y presentación
+CREATE TABLE producto_existencias (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_producto INT NOT NULL,
+    id_color INT NOT NULL,
+    id_presentacion INT NOT NULL,
+    stock DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    UNIQUE KEY uniq_variacion (id_color, id_presentacion),
+    FOREIGN KEY (id_producto) REFERENCES productos(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_color) REFERENCES producto_colores(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_presentacion) REFERENCES producto_presentaciones(id) ON DELETE CASCADE
+);
+
 -- Crear la tabla de pedidos
 CREATE TABLE pedidos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
     id_producto INT NOT NULL,
-    cantidad INT NOT NULL,
+    id_color INT DEFAULT NULL,
+    id_presentacion INT DEFAULT NULL,
+    cantidad DECIMAL(10, 2) NOT NULL,
+    unidad ENUM('rollo', 'metro') NOT NULL DEFAULT 'metro',
+    precio_unitario DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    total DECIMAL(12, 2) NOT NULL DEFAULT 0,
     estado ENUM('pendiente', 'confirmado', 'completado', 'cancelado') NOT NULL DEFAULT 'pendiente',
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id),
-    FOREIGN KEY (id_producto) REFERENCES productos(id)
+    FOREIGN KEY (id_producto) REFERENCES productos(id),
+    FOREIGN KEY (id_color) REFERENCES producto_colores(id),
+    FOREIGN KEY (id_presentacion) REFERENCES producto_presentaciones(id)
 );
 
 -- Crear la tabla de comentarios

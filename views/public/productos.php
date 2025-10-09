@@ -30,7 +30,7 @@ $productos = $productoModel->obtenerProductosVisibles();
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <h5 class="card-title mb-0"><?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8'); ?></h5>
-                                    <span class="product-price">$<?= number_format($producto['precio'], 2) ?></span>
+                                    <span class="product-price">$<?= number_format($producto['precio_desde'] ?? $producto['precio'], 2) ?></span>
                                 </div>
                                 <p class="card-text mb-4"><?= htmlspecialchars($producto['descripcion'], ENT_QUOTES, 'UTF-8'); ?></p>
                                 <div class="d-flex justify-content-between align-items-center">

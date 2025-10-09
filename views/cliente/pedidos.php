@@ -43,7 +43,10 @@ unset($_SESSION['reserva_mensaje'], $_SESSION['reserva_tipo']);
                             <tr>
                                 <th>ID Pedido</th>
                                 <th>Producto</th>
+                                <th>Presentación</th>
+                                <th>Color</th>
                                 <th>Cantidad</th>
+                                <th>Subtotal</th>
                                 <th>Estado</th>
                                 <th class="text-end">Acciones</th>
                             </tr>
@@ -84,7 +87,10 @@ unset($_SESSION['reserva_mensaje'], $_SESSION['reserva_tipo']);
                             <tr>
                                 <th>ID Pedido</th>
                                 <th>Producto</th>
+                                <th>Presentación</th>
+                                <th>Color</th>
                                 <th>Cantidad</th>
+                                <th>Total</th>
                                 <th>Estado</th>
                                 <th>Fecha</th>
                             </tr>

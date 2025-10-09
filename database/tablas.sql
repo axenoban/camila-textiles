@@ -78,14 +78,10 @@ CREATE TABLE sucursales (
 -- Datos de ejemplo realistas
 
 -- Usuarios (un administrador y dos clientes)
--- Las contraseñas en texto plano son:
---   Administrador: AdminCamila2024!
---   Lucía Fernández: ClienteLuz#1
---   Marcos Delgado: ClienteMarcos#1
 INSERT INTO usuarios (nombre, email, clave, rol) VALUES
-('Camila Rivas', 'admin@camilatextiles.com', '$2y$12$uDAkRi3woqTwT3QC2dizwuIagONG3kbZ5YA2G4D0fRUv3KEeXe2LS', 'administrador'),
-('Lucía Fernández', 'lucia.fernandez@example.com', '$2y$12$3jhMOzbJIBSUFRt1uAd97.sZ2QjCPeUvKLg5IevmWr.6XN2GiJGuK', 'cliente'),
-('Marcos Delgado', 'marcos.delgado@example.com', '$2y$12$PRbyvWM4DMBUF7fVIM72d.At88famT7P4PQdmxWwXqLImlUHf5pL2', 'cliente');
+('Camila Rivas', 'admin@camilatextiles.com', '$2y$12$IZg2ygBFt728hSrSVFfVEeyllnPpCrPHKle5pUs9mw5fgfOFTJ3x.', 'administrador'),
+('Lucía Fernández', 'lucia.fernandez@example.com', '$2y$12$COytam4/33Irk1uUJ8UCLOnvtZHLxdWOmEa0RYgI7wd3e7j0TmsUW', 'cliente'),
+('Marcos Delgado', 'marcos.delgado@example.com', '$2y$12$HhptmQQo1zLJDjUJeE2HVuzNh4h19ngGZE1ftgZ8Rd62X.qxq5XSy', 'cliente');
 
 -- Productos textiles con imágenes externas para el catálogo
 INSERT INTO productos (nombre, descripcion, precio, imagen, visible) VALUES

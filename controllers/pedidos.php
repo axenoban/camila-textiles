@@ -8,7 +8,7 @@ class PedidosController {
     public function listarPedidosCliente() {
         // Obtiene los pedidos de un cliente desde la base de datos
         $pedidoModel = new Pedido();
-        $pedidos = $pedidoModel->obtenerPedidosPorCliente($_SESSION['usuario']);
+        $pedidos = $pedidoModel->obtenerPedidosPorCliente($_SESSION['usuario']['id'] ?? 0);
         include('views/cliente/pedidos.php');
     }
 

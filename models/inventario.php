@@ -31,6 +31,16 @@ class Inventario {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function obtenerStockPorProducto($idProducto) {
+        global $pdo;
+
+        $stmt = $pdo->prepare('SELECT cantidad FROM inventarios WHERE id_producto = :id_producto');
+        $stmt->execute(['id_producto' => (int) $idProducto]);
+        $cantidad = $stmt->fetchColumn();
+
+        return $cantidad !== false ? (int) $cantidad : 0;
+    }
+
     // Método para agregar un producto al inventario
     public function agregarAlInventario($idProducto, $cantidad) {
         global $pdo;
@@ -45,6 +55,16 @@ class Inventario {
 
         $stmt = $pdo->prepare("DELETE FROM inventarios WHERE id_producto = :id_producto");
         return $stmt->execute(['id_producto' => $idProducto]);
+    }
+
+    public function disminuirStock($idProducto, $cantidad) {
+        global $pdo;
+
+        $stmt = $pdo->prepare('UPDATE inventarios SET cantidad = GREATEST(cantidad - :cantidad, 0) WHERE id_producto = :id_producto');
+        return $stmt->execute([
+            'cantidad' => (int) $cantidad,
+            'id_producto' => (int) $idProducto,
+        ]);
     }
 }
 ?>

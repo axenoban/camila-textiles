@@ -6,21 +6,22 @@ require_once __DIR__ . '/../../models/producto.php';
 $pedidoModel = new Pedido();
 $productoModel = new Producto();
 
+$clienteActual = $_SESSION['usuario']; // asegúrate de tener esto definido
+
 $pedidosCliente = $pedidoModel->obtenerPedidosPorCliente($clienteActual['id']);
-$pedidosActivos = array_filter($pedidosCliente, function ($pedido) {
-    return in_array($pedido['estado'], ['pendiente', 'confirmado']);
-});
-$pedidosCompletados = array_filter($pedidosCliente, function ($pedido) {
-    return $pedido['estado'] === 'completado';
-});
+$pedidosActivos = array_filter($pedidosCliente, fn($p) => in_array($p['estado'], ['pendiente', 'confirmado']));
+$pedidosCompletados = array_filter($pedidosCliente, fn($p) => $p['estado'] === 'completado');
 $totalPedidos = count($pedidosCliente);
 $productosDisponibles = $productoModel->contarProductosVisibles();
 $totalGasto = array_reduce($pedidosCliente, function ($carry, $pedido) {
-    return $carry + ($pedido['precio'] * $pedido['cantidad']);
+    $precio = isset($pedido['precio_unitario']) ? (float) $pedido['precio_unitario'] : 0;
+    $cantidad = isset($pedido['cantidad']) ? (float) $pedido['cantidad'] : 0;
+    return $carry + ($precio * $cantidad);
 }, 0);
 $pedidosRecientes = array_slice($pedidosCliente, 0, 3);
 $ultimoPedido = $pedidosCliente[0] ?? null;
 ?>
+
 <!-- views/cliente/dashboard.php -->
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>

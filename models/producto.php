@@ -6,13 +6,21 @@ require_once __DIR__ . '/../database/conexion.php';
 class Producto {
 
     // Método para obtener todos los productos visibles
-    public function obtenerProductosVisibles() {
-        global $pdo;
+   public function obtenerProductosVisibles() {
+    global $pdo;
+    $sql = "
+        SELECT p.*, 
+               COALESCE(SUM(pi.stock), i.cantidad, 0) AS stock
+        FROM productos p
+        LEFT JOIN inventarios i ON p.id = i.id_producto
+        LEFT JOIN producto_existencias pi ON p.id = pi.id_producto
+        WHERE p.visible = 1
+        GROUP BY p.id
+        ORDER BY p.fecha_creacion DESC
+    ";
+    return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+}
 
-        $stmt = $pdo->prepare("SELECT p.*, COALESCE(i.cantidad, 0) AS stock FROM productos p LEFT JOIN inventarios i ON i.id_producto = p.id WHERE p.visible = 1");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
 
     // Método para obtener todos los productos sin filtro de visibilidad
     public function obtenerTodosLosProductos() {

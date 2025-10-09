@@ -8,52 +8,72 @@ $productos = $productoModel->obtenerProductosVisibles();
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
 
-<main class="main-area">
-    <div class="container-fluid px-4 px-lg-5">
-        <section class="client-section">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+<main class="main-content">
+    <section class="section">
+        <div class="container">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 mb-4">
                 <div>
-                    <h1 class="section-heading mb-2">Catálogo exclusivo para clientes</h1>
-                    <p class="section-subtitle mb-0">Selecciona las telas ideales y realiza tu pedido con disponibilidad confirmada.</p>
+                    <h1 class="section-title text-start mb-2">Catálogo exclusivo para clientes</h1>
+                    <p class="text-muted mb-0">
+                        Filtramos y clasificamos los textiles para facilitar tu selección 
+                        y asegurar disponibilidad inmediata.
+                    </p>
                 </div>
-                <div class="d-flex flex-wrap gap-2">
-                    <button class="btn btn-outline-primary" type="button">Favoritos</button>
-                    <button class="btn btn-outline-primary" type="button">Nuevas tendencias</button>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-outline-primary rounded-pill px-4" type="button">Favoritos</button>
+                    <button class="btn btn-outline-primary rounded-pill px-4" type="button">Nuevas</button>
+                    <button class="btn btn-outline-primary rounded-pill px-4" type="button">Mayoristas</button>
                 </div>
             </div>
-        </section>
-        <div class="row g-4">
-            <?php if (!empty($productos)): ?>
-                <?php foreach ($productos as $producto): ?>
-                <div class="col-12 col-md-6 col-xl-4">
-                    <div class="portal-card h-100">
-                        <img src="<?= htmlspecialchars($producto['imagen'], ENT_QUOTES, 'UTF-8'); ?>" class="img-fluid rounded-4 mb-3" alt="<?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8'); ?>">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <h5 class="fw-semibold mb-1"><?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8'); ?></h5>
-                            <span class="badge bg-light text-primary fw-semibold">$<?= number_format((float) $producto['precio'], 2); ?></span>
-                        </div>
-                        <p class="text-muted mb-4"><?= htmlspecialchars($producto['descripcion'], ENT_QUOTES, 'UTF-8'); ?></p>
-                        <p class="small text-muted mb-3">Stock disponible: <?= (int) ($producto['stock'] ?? 0); ?> unidades</p>
-                        <form action="<?= BASE_URL ?>/controllers/pedidos_cliente.php" method="POST" class="d-grid gap-2">
-                            <input type="hidden" name="producto_id" value="<?= (int) $producto['id']; ?>">
-                            <div class="input-group">
-                                <label class="input-group-text" for="cantidad-<?= (int) $producto['id']; ?>">Cantidad</label>
-                                <input type="number" class="form-control" id="cantidad-<?= (int) $producto['id']; ?>" name="cantidad" min="1" value="1" required>
+
+            <div class="product-grid">
+                <?php if (!empty($productos)): ?>
+                    <?php foreach ($productos as $producto): ?>
+                        <article class="product-card">
+                            <img src="<?= htmlspecialchars($producto['imagen'], ENT_QUOTES, 'UTF-8'); ?>" 
+                                 alt="<?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8'); ?>">
+
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="card-title mb-0"><?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8'); ?></h5>
+                                    <span class="product-price">
+                                        $<?= number_format($producto['precio_desde'] ?? $producto['precio'], 2) ?>
+                                    </span>
+                                </div>
+
+                                <p class="card-text mb-4"><?= htmlspecialchars($producto['descripcion'], ENT_QUOTES, 'UTF-8'); ?></p>
+
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge-soft <?= ($producto['stock'] ?? 0) > 0 ? 'text-success' : 'text-danger'; ?>">
+                                        <?= ($producto['stock'] ?? 0) > 0 
+                                            ? 'Stock disponible: ' . (int) $producto['stock'] 
+                                            : 'Sin stock en este momento'; ?>
+                                    </span>
+
+                                    <!-- 🔗 Detalle del cliente -->
+                                    <a href="<?= BASE_URL ?>/views/cliente/detalle_producto_cliente.php?id=<?= (int) $producto['id']; ?>" 
+                                       class="btn btn-primary">Ver detalles</a>
+                                </div>
+
+                                <span class="badge-soft <?= ($producto['stock'] ?? 0) > 0 ? 'text-success' : 'text-danger'; ?>">
+                                    <?= ($producto['stock'] ?? 0) > 0 ? 'Disponible' : 'Agotado'; ?>
+                                </span>
                             </div>
-                            <button type="submit" class="btn btn-primary">Reservar ahora</button>
-                        </form>
+                        </article>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="bi bi-emoji-neutral"></i></div>
+                        <h5 class="fw-semibold">Aún no se han cargado productos</h5>
+                        <p class="text-muted mb-0">
+                            Cuando el administrador publique nuevas telas, 
+                            aparecerán automáticamente aquí.
+                        </p>
                     </div>
-                </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <div class="col-12">
-                    <div class="alert alert-info mb-0" role="alert">
-                        Aún no hay productos disponibles para reservar. Vuelve más tarde para descubrir nuevas telas.
-                    </div>
-                </div>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
         </div>
-    </div>
+    </section>
 </main>
 
 <?php include('includes/footer.php'); ?>

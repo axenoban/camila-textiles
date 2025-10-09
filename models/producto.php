@@ -9,38 +9,7 @@ class Producto {
     public function obtenerProductosVisibles() {
         global $pdo;
 
-        $sql = "
-            SELECT 
-                p.*, 
-                COALESCE(variantes.stock_total, i.cantidad, 0) AS stock,
-                COALESCE(precios.precio_desde, p.precio) AS precio_desde,
-                COALESCE(colores.total_colores, 0) AS total_colores
-            FROM productos p
-            LEFT JOIN (
-                SELECT 
-                    pe.id_producto,
-                    SUM(
-                        CASE 
-                            WHEN pp.tipo = 'rollo' THEN pe.stock * COALESCE(pp.metros_por_unidad, 0)
-                            ELSE pe.stock
-                        END
-                    ) AS stock_total
-                FROM producto_existencias pe
-                INNER JOIN producto_presentaciones pp ON pe.id_presentacion = pp.id
-                GROUP BY pe.id_producto
-            ) AS variantes ON variantes.id_producto = p.id
-            LEFT JOIN inventarios i ON i.id_producto = p.id
-            LEFT JOIN (
-                SELECT id_producto, MIN(precio) AS precio_desde FROM producto_presentaciones GROUP BY id_producto
-            ) AS precios ON precios.id_producto = p.id
-            LEFT JOIN (
-                SELECT id_producto, COUNT(*) AS total_colores FROM producto_colores GROUP BY id_producto
-            ) AS colores ON colores.id_producto = p.id
-            WHERE p.visible = 1
-            ORDER BY p.fecha_creacion DESC
-        ";
-
-        $stmt = $pdo->prepare($sql);
+        $stmt = $pdo->prepare("SELECT p.*, COALESCE(i.cantidad, 0) AS stock FROM productos p LEFT JOIN inventarios i ON i.id_producto = p.id WHERE p.visible = 1");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

@@ -13,6 +13,10 @@ if (!isset($_SESSION['usuario'])) {
 
 $clienteActual = $_SESSION['usuario'];
 
+if (($_SESSION['rol'] ?? '') !== $clienteActual['rol']) {
+    $_SESSION['rol'] = $clienteActual['rol'];
+}
+
 if (($clienteActual['rol'] ?? '') !== 'cliente') {
     header('Location: ' . BASE_URL . '/index.php');
     exit;

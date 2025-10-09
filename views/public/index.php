@@ -17,8 +17,8 @@ $productos = $productoModel->obtenerProductosDestacados(6);
                     <h1 class="hero-title mt-3">Gestión inteligente para una empresa textil en constante crecimiento</h1>
                     <p class="hero-subtitle">Digitalizamos el inventario, los pedidos y la experiencia de compra de Camila Textil para conectar en tiempo real a los clientes con las telas que buscan.</p>
                     <div class="d-flex flex-wrap gap-3 mt-4">
-                        <a class="btn btn-primary btn-lg rounded-pill px-4" href="/camila-textil/views/public/productos.php">Explorar catálogo</a>
-                        <a class="btn btn-outline-primary rounded-pill px-4" href="/camila-textil/views/public/acerca.php">Conocer la empresa</a>
+                        <a class="btn btn-primary btn-lg rounded-pill px-4" href="<?= BASE_URL ?>/views/public/productos.php">Explorar catálogo</a>
+                        <a class="btn btn-outline-primary rounded-pill px-4" href="<?= BASE_URL ?>/views/public/acerca.php">Conocer la empresa</a>
                     </div>
                     <div class="hero-metrics">
                         <div class="metric-card">
@@ -81,7 +81,7 @@ $productos = $productoModel->obtenerProductosDestacados(6);
                     <h2 class="section-title text-start mb-0">Productos destacados</h2>
                     <p class="text-muted mb-0">Una selección con la textura, los colores y el rendimiento que tus proyectos necesitan.</p>
                 </div>
-                <a class="btn btn-outline-primary rounded-pill px-4 mt-3 mt-md-0" href="/camila-textil/views/public/productos.php">Ver todo el catálogo</a>
+                <a class="btn btn-outline-primary rounded-pill px-4 mt-3 mt-md-0" href="<?= BASE_URL ?>/views/public/productos.php">Ver todo el catálogo</a>
             </div>
             <div class="product-grid">
                 <?php foreach ($productos as $producto): ?>
@@ -93,7 +93,7 @@ $productos = $productoModel->obtenerProductosDestacados(6);
                                 <span class="product-price">$<?= number_format($producto['precio'], 2) ?></span>
                             </div>
                             <p class="card-text mb-4"><?= $producto['descripcion'] ?></p>
-                            <a href="/camila-textil/views/public/productos.php" class="btn btn-primary w-100">Explorar más opciones</a>
+                            <a href="<?= BASE_URL ?>/views/public/productos.php" class="btn btn-primary w-100">Explorar más opciones</a>
                         </div>
                     </article>
                 <?php endforeach; ?>

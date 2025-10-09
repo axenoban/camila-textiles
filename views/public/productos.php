@@ -39,6 +39,10 @@ $productos = $productoModel->obtenerProductosVisibles();
                                     </span>
                                     <a href="<?= BASE_URL ?>/views/cliente/productos.php" class="btn btn-primary">Reservar</a>
                                 </div>
+                                <span class="badge-soft <?= ($producto['stock'] ?? 0) > 0 ? 'text-success' : 'text-danger'; ?>">
+                                    <?= ($producto['stock'] ?? 0) > 0 ? 'Disponible' : 'Agotado'; ?>
+                                </span>
+                                <a href="<?= BASE_URL ?>/views/public/detalle_producto.php?id=<?= (int) $producto['id']; ?>" class="btn btn-outline-primary w-100">Ver detalles</a>
                             </div>
                         </article>
                     <?php endforeach; ?>

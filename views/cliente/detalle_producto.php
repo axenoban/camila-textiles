@@ -67,9 +67,6 @@ $datosVariantes = [
     'presentaciones' => $presentaciones,
     'matriz' => $variantes,
 ];
-
-$disponibleProducto = (float) ($producto['stock_total'] ?? $producto['stock'] ?? 0) > 0;
-$estadoProducto = $disponibleProducto ? 'Disponible' : 'Agotado temporalmente';
 ?>
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
@@ -156,15 +153,14 @@ $estadoProducto = $disponibleProducto ? 'Disponible' : 'Agotado temporalmente';
                 <p class="section-subtitle mb-0">Gestiona tu reserva escogiendo color, formato y volumen en un solo lugar.</p>
             </div>
             <div class="text-lg-end">
-                <span class="badge bg-light text-primary fw-semibold">Precio desde Bs <?= number_format((float) ($producto['precio_desde'] ?? $producto['precio']), 2); ?></span>
-                <div class="small text-muted">Estado: <?= htmlspecialchars($estadoProducto, ENT_QUOTES, 'UTF-8'); ?></div>
+                <span class="badge bg-light text-primary fw-semibold">Precio desde $<?= number_format((float) ($producto['precio_desde'] ?? $producto['precio']), 2); ?></span>
+                <div class="small text-muted">Stock equivalente: <?= (int) ($producto['stock_total'] ?? $producto['stock'] ?? 0); ?> metros</div>
             </div>
         </div>
 
         <?php if ($mensajeReserva): ?>
-            <div class="alert alert-<?= $tipoReserva === 'success' ? 'success' : 'danger'; ?> alert-dismissible fade show" role="alert" data-auto-dismiss="true">
+            <div class="alert alert-<?= $tipoReserva === 'success' ? 'success' : 'danger'; ?>" role="alert">
                 <?= htmlspecialchars($mensajeReserva, ENT_QUOTES, 'UTF-8'); ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
             </div>
         <?php endif; ?>
 
@@ -223,7 +219,6 @@ $estadoProducto = $disponibleProducto ? 'Disponible' : 'Agotado temporalmente';
                         <input type="hidden" name="producto_id" value="<?= (int) $producto['id']; ?>">
                         <input type="hidden" name="color_id" id="color_id" value="<?= (int) ($colorDisponible ?? 0); ?>">
                         <input type="hidden" name="presentacion_id" id="presentacion_id" value="<?= (int) ($presentacionDisponible ?? 0); ?>">
-                        <input type="hidden" name="line_items" id="line_items" value="[]">
                         <div class="mb-4">
                             <h5 class="fw-semibold mb-3">Selecciona un color</h5>
                             <?php if (!empty($colores)): ?>
@@ -252,7 +247,7 @@ $estadoProducto = $disponibleProducto ? 'Disponible' : 'Agotado temporalmente';
                                         <div class="col-sm-6">
                                             <label class="option-card <?= $activo ? 'active' : ''; ?>" data-presentacion-id="<?= (int) $presentacion['id']; ?>" data-tipo="<?= htmlspecialchars($presentacion['tipo'], ENT_QUOTES, 'UTF-8'); ?>" data-precio="<?= number_format((float) $presentacion['precio'], 2, '.', ''); ?>" data-metros="<?= number_format((float) ($presentacion['metros_por_unidad'] ?? 0), 2, '.', ''); ?>">
                                                 <strong class="d-block text-capitalize mb-1"><?= htmlspecialchars($presentacion['tipo'], ENT_QUOTES, 'UTF-8'); ?></strong>
-                                                <span class="d-block text-muted small">Bs <?= number_format((float) $presentacion['precio'], 2); ?> <?= $presentacion['tipo'] === 'rollo' ? 'por rollo' : 'por metro'; ?></span>
+                                                <span class="d-block text-muted small">$<?= number_format((float) $presentacion['precio'], 2); ?> <?= $presentacion['tipo'] === 'rollo' ? 'por rollo' : 'por metro'; ?></span>
                                                 <?php if ($presentacion['tipo'] === 'rollo'): ?>
                                                     <span class="badge-soft mt-2">≈ <?= number_format((float) ($presentacion['metros_por_unidad'] ?? 0), 0); ?> metros útiles</span>
                                                 <?php endif; ?>
@@ -268,37 +263,23 @@ $estadoProducto = $disponibleProducto ? 'Disponible' : 'Agotado temporalmente';
                             <h5 class="fw-semibold mb-3">Cantidad</h5>
                             <div class="input-group">
                                 <label class="input-group-text" for="cantidad">Unidades</label>
-                                <input type="number" class="form-control" id="cantidad" min="0.5" step="0.5" value="0.5" required>
+                                <input type="number" class="form-control" id="cantidad" name="cantidad" min="1" value="1" required>
                             </div>
                             <div class="form-text" id="ayuda-disponibilidad"></div>
-                        </div>
-                        <div class="mb-4">
-                            <button type="button" class="btn btn-outline-primary w-100" id="btn-agregar" <?= empty($variantes) ? 'disabled' : ''; ?>>Agregar combinación al pedido</button>
-                        </div>
-                        <div class="mb-4">
-                            <h5 class="fw-semibold mb-3">Resumen del pedido</h5>
-                            <div id="resumen-items" class="summary-card">
-                                <p class="mb-0 text-muted">Todavía no has agregado combinaciones. Selecciona color, presentación y cantidad para construir tu pedido.</p>
-                            </div>
                         </div>
                         <div class="mt-auto">
                             <div class="summary-card mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="text-muted">Precio unitario actual</span>
-                                    <strong id="precio-unitario">Bs 0.00</strong>
+                                    <span class="text-muted">Precio unitario</span>
+                                    <strong id="precio-unitario">$0.00</strong>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="text-muted">Subtotal actual</span>
-                                    <strong id="total-resumen">Bs 0.00</strong>
-                                </div>
-                                <hr>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fw-semibold">Total del pedido</span>
-                                    <strong id="total-pedido">Bs 0.00</strong>
+                                    <span class="text-muted">Subtotal estimado</span>
+                                    <strong id="total-resumen">$0.00</strong>
                                 </div>
                                 <div class="small text-muted mt-2" id="equivalencia-texto"></div>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100" id="btn-reservar" disabled>Reservar pedido</button>
+                            <button type="submit" class="btn btn-primary w-100" id="btn-reservar" <?= empty($variantes) ? 'disabled' : ''; ?>>Reservar selección</button>
                         </div>
                     </form>
                 </div>
@@ -339,110 +320,25 @@ $estadoProducto = $disponibleProducto ? 'Disponible' : 'Agotado temporalmente';
     const colorInput = document.getElementById('color_id');
     const presentacionInput = document.getElementById('presentacion_id');
     const cantidadInput = document.getElementById('cantidad');
-    const precioUnitarioEl = document.getElementById('precio-unitario');
-    const subtotalActualEl = document.getElementById('total-resumen');
-    const totalPedidoEl = document.getElementById('total-pedido');
-    const equivalenciaTextoEl = document.getElementById('equivalencia-texto');
+    const precioUnitario = document.getElementById('precio-unitario');
+    const totalResumen = document.getElementById('total-resumen');
+    const textoEquivalencia = document.getElementById('equivalencia-texto');
     const ayudaDisponibilidad = document.getElementById('ayuda-disponibilidad');
     const botonReservar = document.getElementById('btn-reservar');
-    const botonAgregar = document.getElementById('btn-agregar');
-    const resumenItems = document.getElementById('resumen-items');
-    const lineItemsInput = document.getElementById('line_items');
 
-    const formatoMoneda = new Intl.NumberFormat('es-BO', { style: 'currency', currency: 'BOB' });
-    const formatoCantidad = new Intl.NumberFormat('es-BO', { maximumFractionDigits: 2, minimumFractionDigits: 0 });
-
-    const lineItems = [];
+    const formatoMoneda = new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' });
 
     function obtenerDetalleSeleccion(colorId, presentacionId) {
         if (!dataVariantes.matriz[colorId] || !dataVariantes.matriz[colorId][presentacionId]) {
             return null;
         }
-
-        const presentacion = dataVariantes.presentaciones.find(
-            (p) => parseInt(p.id, 10) === parseInt(presentacionId, 10)
-        );
-
+        const presentacion = dataVariantes.presentaciones.find(p => parseInt(p.id, 10) === parseInt(presentacionId, 10));
         return {
             ...dataVariantes.matriz[colorId][presentacionId],
             precio: presentacion ? parseFloat(presentacion.precio) : 0,
             tipo: presentacion ? presentacion.tipo : 'metro',
-            metrosPorUnidad: presentacion ? parseFloat(presentacion.metros_por_unidad || 1) : 1,
+            metrosPorUnidad: presentacion ? parseFloat(presentacion.metros_por_unidad || 1) : 1
         };
-    }
-
-    function obtenerCantidadEnPedido(colorId, presentacionId) {
-        const encontrado = lineItems.find(
-            (item) => item.color_id === colorId && item.presentacion_id === presentacionId
-        );
-
-        return encontrado ? parseFloat(encontrado.cantidad) : 0;
-    }
-
-    function renderResumen() {
-        if (!resumenItems) {
-            return;
-        }
-
-        if (lineItems.length === 0) {
-            resumenItems.innerHTML = '<p class="mb-0 text-muted">Todavía no has agregado combinaciones. Selecciona color, presentación y cantidad para construir tu pedido.</p>';
-            totalPedidoEl.textContent = formatoMoneda.format(0);
-            botonReservar.disabled = true;
-            lineItemsInput.value = '[]';
-            return;
-        }
-
-        let total = 0;
-        let contenido = '<div class="table-responsive"><table class="table table-modern table-sm mb-0">';
-        contenido += '<thead><tr><th>Color</th><th>Presentación</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th><th class="text-end">Acciones</th></tr></thead><tbody>';
-
-        lineItems.forEach((item, index) => {
-            const subtotal = item.precio_unitario * item.cantidad;
-            total += subtotal;
-
-            const cantidadLegible = item.presentacion_tipo === 'rollo'
-                ? `${item.cantidad} ${item.cantidad === 1 ? 'rollo' : 'rollos'}${item.metros_por_unidad ? ` · ${Math.round(item.metros_por_unidad)} m c/u` : ''}`
-                : `${formatoCantidad.format(item.cantidad)} metros`;
-
-            contenido += `
-                <tr>
-                    <td>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge rounded-pill" style="background:${item.codigo_hex || '#d1d5db'}; width:1.5rem; height:1.5rem;"></span>
-                            <span>${item.color_nombre}</span>
-                        </div>
-                    </td>
-                    <td class="text-capitalize">${item.presentacion_tipo}</td>
-                    <td>${cantidadLegible}</td>
-                    <td>${formatoMoneda.format(item.precio_unitario)}</td>
-                    <td>${formatoMoneda.format(subtotal)}</td>
-                    <td class="text-end">
-                        <button type="button" class="btn btn-link btn-sm text-danger" data-remove-index="${index}">Quitar</button>
-                    </td>
-                </tr>
-            `;
-        });
-
-        contenido += '</tbody></table></div>';
-        resumenItems.innerHTML = contenido;
-        totalPedidoEl.textContent = formatoMoneda.format(total);
-        botonReservar.disabled = false;
-        lineItemsInput.value = JSON.stringify(lineItems.map((item) => ({
-            color_id: item.color_id,
-            presentacion_id: item.presentacion_id,
-            cantidad: item.cantidad,
-        })));
-
-        resumenItems.querySelectorAll('[data-remove-index]').forEach((boton) => {
-            boton.addEventListener('click', () => {
-                const indice = parseInt(boton.dataset.removeIndex, 10);
-                if (!Number.isNaN(indice)) {
-                    lineItems.splice(indice, 1);
-                    renderResumen();
-                    actualizarEstado();
-                }
-            });
-        });
     }
 
     function actualizarEstado() {
@@ -451,157 +347,54 @@ $estadoProducto = $disponibleProducto ? 'Disponible' : 'Agotado temporalmente';
         const detalle = obtenerDetalleSeleccion(colorId, presentacionId);
 
         if (!detalle) {
-            precioUnitarioEl.textContent = 'Bs 0.00';
-            subtotalActualEl.textContent = 'Bs 0.00';
-            equivalenciaTextoEl.textContent = '';
+            precioUnitario.textContent = '$0.00';
+            totalResumen.textContent = '$0.00';
+            textoEquivalencia.textContent = '';
             ayudaDisponibilidad.textContent = 'Selecciona una combinación con stock disponible.';
-            botonAgregar.disabled = true;
+            botonReservar.disabled = true;
             return;
         }
 
-        const stock = parseFloat(detalle.stock);
-        const reservado = obtenerCantidadEnPedido(colorId, presentacionId);
-        const disponible = Math.max(0, stock - reservado);
+        const stock = detalle.stock;
         const tipo = detalle.tipo;
+        const metros = tipo === 'rollo' ? Math.round(detalle.metrosPorUnidad) : 1;
+        const cantidadMaxima = Math.floor(stock);
         const precio = detalle.precio;
-        const metros = tipo === 'rollo' ? Math.round(detalle.metrosPorUnidad || 0) : 1;
 
-        if (tipo === 'rollo') {
-            cantidadInput.step = '1';
-            cantidadInput.min = '1';
-            const valorActual = parseFloat(cantidadInput.value);
-            if (Number.isNaN(valorActual) || valorActual < 1) {
-                cantidadInput.value = 1;
-            } else {
-                cantidadInput.value = Math.round(valorActual);
-            }
-            cantidadInput.max = disponible > 0 ? Math.floor(disponible) : 1;
-        } else {
-            cantidadInput.step = '0.5';
-            cantidadInput.min = '0.5';
-            const valorActual = parseFloat(cantidadInput.value);
-            if (Number.isNaN(valorActual) || valorActual < 0.5) {
-                cantidadInput.value = 0.5;
-            } else {
-                cantidadInput.value = (Math.round(valorActual * 2) / 2).toFixed(1);
-            }
-            if (disponible > 0) {
-                cantidadInput.max = disponible;
-            } else {
-                cantidadInput.removeAttribute('max');
-            }
+        cantidadInput.max = cantidadMaxima > 0 ? cantidadMaxima : 1;
+        if (parseInt(cantidadInput.value, 10) > cantidadMaxima && cantidadMaxima > 0) {
+            cantidadInput.value = cantidadMaxima;
         }
 
-        const cantidad = parseFloat(cantidadInput.value) || 0;
-
-        precioUnitarioEl.textContent = formatoMoneda.format(precio);
-        subtotalActualEl.textContent = formatoMoneda.format(precio * cantidad);
+        precioUnitario.textContent = formatoMoneda.format(precio);
+        const cantidad = parseInt(cantidadInput.value, 10) || 0;
+        totalResumen.textContent = formatoMoneda.format(precio * cantidad);
 
         if (stock <= 0) {
-            ayudaDisponibilidad.textContent = 'Temporalmente agotado para esta combinación. Prueba con otra opción.';
-            botonAgregar.disabled = true;
-            return;
-        }
-
-        const equivalenciaTexto = tipo === 'rollo'
-            ? `Cada rollo equivale aproximadamente a ${metros} metros.`
-            : 'Puedes solicitar cortes desde 0.5 metros en adelante.';
-        equivalenciaTextoEl.textContent = equivalenciaTexto;
-
-        let mensajeDisponibilidad = 'Disponible para agregar a tu pedido.';
-
-        if (disponible <= 0) {
-            mensajeDisponibilidad = 'Ya alcanzaste la disponibilidad de esta variante en tu pedido actual.';
-            botonAgregar.disabled = true;
+            ayudaDisponibilidad.textContent = 'Sin stock para esta combinación, prueba con otro color o presentación.';
+            botonReservar.disabled = true;
         } else {
-            botonAgregar.disabled = false;
-            if (reservado > 0) {
-                mensajeDisponibilidad = 'Esta combinación ya figura en tu resumen. Ajusta cantidades desde la tabla inferior.';
-            } else if (disponible < (tipo === 'rollo' ? 3 : 30)) {
-                mensajeDisponibilidad = 'Disponibilidad limitada, confirma tu reserva cuanto antes.';
-            }
+            const equivalenciaTexto = tipo === 'rollo'
+                ? `Cada rollo equivale aproximadamente a ${metros} metros.`
+                : 'Compra por metro con corte industrial incluido.';
+            textoEquivalencia.textContent = equivalenciaTexto;
+            ayudaDisponibilidad.textContent = `Disponibles: ${cantidadMaxima} ${tipo === 'rollo' ? 'rollos' : 'metros'}.`;
+            botonReservar.disabled = cantidad <= 0;
         }
-
-        ayudaDisponibilidad.textContent = mensajeDisponibilidad;
     }
 
-    function agregarCombinacion() {
-        const colorId = parseInt(colorInput.value, 10);
-        const presentacionId = parseInt(presentacionInput.value, 10);
-        const detalle = obtenerDetalleSeleccion(colorId, presentacionId);
-
-        if (!detalle) {
-            return;
-        }
-
-        let cantidad = parseFloat(cantidadInput.value);
-        if (Number.isNaN(cantidad) || cantidad <= 0) {
-            ayudaDisponibilidad.textContent = 'Ingresa una cantidad válida antes de agregar la combinación.';
-            return;
-        }
-
-        if (detalle.tipo === 'rollo') {
-            cantidad = Math.max(1, Math.round(cantidad));
-        } else {
-            cantidad = Math.max(0.5, Math.round(cantidad * 2) / 2);
-        }
-
-        const reservado = obtenerCantidadEnPedido(colorId, presentacionId);
-        const stock = parseFloat(detalle.stock);
-        const disponible = stock - reservado;
-
-        if (disponible <= 0) {
-            ayudaDisponibilidad.textContent = 'Ya alcanzaste la disponibilidad de esta combinación en tu pedido actual.';
-            return;
-        }
-
-        if (cantidad > disponible + 0.0001) {
-            ayudaDisponibilidad.textContent = 'La cantidad ingresada supera la disponibilidad actual de esta variante. Ajusta el valor para continuar.';
-            return;
-        }
-
-        const existente = lineItems.findIndex(
-            (item) => item.color_id === colorId && item.presentacion_id === presentacionId
-        );
-
-        if (existente >= 0) {
-            lineItems[existente].cantidad = parseFloat((lineItems[existente].cantidad + cantidad).toFixed(2));
-        } else {
-            lineItems.push({
-                color_id: colorId,
-                color_nombre: detalle.colorNombre,
-                codigo_hex: detalle.codigoHex,
-                presentacion_id: presentacionId,
-                presentacion_tipo: detalle.tipo,
-                metros_por_unidad: detalle.metrosPorUnidad,
-                precio_unitario: detalle.precio,
-                cantidad: parseFloat(cantidad.toFixed(2)),
-            });
-        }
-
-        ayudaDisponibilidad.textContent = 'Combinación agregada al resumen de pedido.';
-        if (detalle.tipo === 'rollo') {
-            cantidadInput.value = '1';
-        } else {
-            cantidadInput.value = '0.5';
-        }
-
-        renderResumen();
-        actualizarEstado();
-    }
-
-    document.querySelectorAll('.color-chip').forEach((chip) => {
+    document.querySelectorAll('.color-chip').forEach(chip => {
         chip.addEventListener('click', () => {
-            document.querySelectorAll('.color-chip').forEach((c) => c.classList.remove('active'));
+            document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('active'));
             chip.classList.add('active');
             colorInput.value = chip.dataset.colorId;
             actualizarEstado();
         });
     });
 
-    document.querySelectorAll('.option-card').forEach((option) => {
+    document.querySelectorAll('.option-card').forEach(option => {
         option.addEventListener('click', () => {
-            document.querySelectorAll('.option-card').forEach((op) => op.classList.remove('active'));
+            document.querySelectorAll('.option-card').forEach(op => op.classList.remove('active'));
             option.classList.add('active');
             presentacionInput.value = option.dataset.presentacionId;
             actualizarEstado();
@@ -611,27 +404,6 @@ $estadoProducto = $disponibleProducto ? 'Disponible' : 'Agotado temporalmente';
     cantidadInput.addEventListener('change', actualizarEstado);
     cantidadInput.addEventListener('keyup', actualizarEstado);
 
-    if (botonAgregar) {
-        botonAgregar.addEventListener('click', agregarCombinacion);
-    }
-
-    const formulario = document.getElementById('form-reserva');
-    if (formulario) {
-        formulario.addEventListener('submit', (evento) => {
-            if (lineItems.length === 0) {
-                evento.preventDefault();
-                ayudaDisponibilidad.textContent = 'Añade al menos una combinación para enviar tu pedido.';
-            } else {
-                lineItemsInput.value = JSON.stringify(lineItems.map((item) => ({
-                    color_id: item.color_id,
-                    presentacion_id: item.presentacion_id,
-                    cantidad: item.cantidad,
-                })));
-            }
-        });
-    }
-
-    renderResumen();
     actualizarEstado();
 </script>
 

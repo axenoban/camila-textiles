@@ -21,7 +21,7 @@ $sucursales = $sucursalModel->obtenerSucursales();
         ];
 
         if ($status && isset($mensajes[$status])): ?>
-        <div class="alert alert-<?= $mensajes[$status]['type']; ?> alert-dismissible fade show" role="alert" data-auto-dismiss="true">
+        <div class="alert alert-<?= $mensajes[$status]['type']; ?> alert-dismissible fade show" role="alert">
             <?= htmlspecialchars($mensajes[$status]['text'], ENT_QUOTES, 'UTF-8'); ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
@@ -59,7 +59,7 @@ $sucursales = $sucursalModel->obtenerSucursales();
                                 <td><?= htmlspecialchars($sucursal['horario_apertura'], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td class="text-end text-nowrap">
                                     <a href="editar_sucursal.php?id=<?= (int) $sucursal['id']; ?>" class="btn btn-warning btn-sm me-2">Editar</a>
-                                    <a href="<?= BASE_URL ?>/controllers/sucursales.php?accion=eliminar&amp;id=<?= (int) $sucursal['id']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
+                                    <a href="eliminar_sucursal.php?id=<?= (int) $sucursal['id']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
                                 </td>
                             </tr>
                             <?php endforeach; ?>

@@ -63,20 +63,6 @@ try {
             redirigirProductos(['status' => 'error']);
             break;
 
-        case 'cambiar_visibilidad':
-            $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
-            $visible = filter_input(INPUT_POST, 'visible', FILTER_VALIDATE_INT);
-
-            if ($id === null || $visible === null) {
-                redirigirProductos(['status' => 'error']);
-            }
-
-            $actualizado = $productoModel->actualizarVisibilidad($id, (int) $visible === 1);
-            $estado = (int) $visible === 1 ? 'visibilidad_on' : 'visibilidad_off';
-
-            redirigirProductos(['status' => $actualizado ? $estado : 'error']);
-            break;
-
         default:
             redirigirProductos();
     }

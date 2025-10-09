@@ -63,37 +63,28 @@ class Pedido {
     public function obtenerPedidosPorCliente($idUsuario) {
         global $pdo;
 
-        $sql = "
-            SELECT
-                p.*,
-                pr.nombre AS producto,
-                pr.imagen
-            FROM pedidos p
-            INNER JOIN productos pr ON p.id_producto = pr.id
-            WHERE p.id_usuario = :id_usuario
-            ORDER BY p.fecha_creacion DESC
-        ";
-
-        $stmt = $pdo->prepare($sql);
+        $stmt = $pdo->prepare("SELECT p.*, pr.nombre AS producto, pr.precio FROM pedidos p INNER JOIN productos pr ON p.id_producto = pr.id WHERE p.id_usuario = :id_usuario ORDER BY p.fecha_creacion DESC");
         $stmt->execute(['id_usuario' => (int) $idUsuario]);
-        $pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return $this->adjuntarDetalles($pedidos);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function obtenerTodosLosPedidos() {
         global $pdo;
 
         $sql = "
-            SELECT
-                p.*,
-                u.nombre AS cliente,
-                u.email AS correo_cliente,
+            SELECT 
+                p.*, 
+                u.nombre AS cliente, 
                 pr.nombre AS producto,
-                pr.imagen
+                pc.nombre AS color_nombre,
+                pc.codigo_hex,
+                pp.tipo AS presentacion_tipo,
+                pp.metros_por_unidad
             FROM pedidos p
             INNER JOIN usuarios u ON p.id_usuario = u.id
             INNER JOIN productos pr ON p.id_producto = pr.id
+            LEFT JOIN producto_colores pc ON p.id_color = pc.id
+            LEFT JOIN producto_presentaciones pp ON p.id_presentacion = pp.id
             ORDER BY p.fecha_creacion DESC
         ";
 
@@ -125,7 +116,7 @@ class Pedido {
     public function calcularIngresosTotales() {
         global $pdo;
 
-        $stmt = $pdo->query("SELECT COALESCE(SUM(total), 0) FROM pedidos WHERE estado IN ('pendiente', 'confirmado', 'completado')");
+        $stmt = $pdo->query("SELECT COALESCE(SUM(p.total), 0) FROM pedidos p WHERE p.estado IN ('pendiente', 'confirmado', 'completado')");
         return (float) $stmt->fetchColumn();
     }
 
@@ -150,37 +141,15 @@ class Pedido {
         return $stmt->execute(['id' => $id]);
     }
 
-    public function crearPedido($idUsuario, $idProducto, $total) {
+    public function crearPedido($idUsuario, $idProducto, $cantidad) {
         global $pdo;
 
-        $stmt = $pdo->prepare("INSERT INTO pedidos (id_usuario, id_producto, total, estado) VALUES (:id_usuario, :id_producto, :total, 'pendiente')");
-
-        $exito = $stmt->execute([
-            'id_usuario' => (int) $idUsuario,
-            'id_producto' => (int) $idProducto,
-            'total' => (float) $total,
-        ]);
-
-        if (!$exito) {
-            return 0;
-        }
-
-        return (int) $pdo->lastInsertId();
-    }
-
-    public function agregarDetalle($idPedido, $idColor, $idPresentacion, $cantidad, $unidad, $precioUnitario, $subtotal) {
-        global $pdo;
-
-        $stmt = $pdo->prepare("INSERT INTO pedido_detalles (id_pedido, id_color, id_presentacion, cantidad, unidad, precio_unitario, subtotal) VALUES (:id_pedido, :id_color, :id_presentacion, :cantidad, :unidad, :precio_unitario, :subtotal)");
+        $stmt = $pdo->prepare("INSERT INTO pedidos (id_usuario, id_producto, cantidad, estado) VALUES (:id_usuario, :id_producto, :cantidad, 'pendiente')");
 
         return $stmt->execute([
-            'id_pedido' => (int) $idPedido,
-            'id_color' => (int) $idColor,
-            'id_presentacion' => (int) $idPresentacion,
-            'cantidad' => (float) $cantidad,
-            'unidad' => $unidad,
-            'precio_unitario' => (float) $precioUnitario,
-            'subtotal' => (float) $subtotal,
+            'id_usuario' => (int) $idUsuario,
+            'id_producto' => (int) $idProducto,
+            'cantidad' => (int) $cantidad,
         ]);
     }
 }

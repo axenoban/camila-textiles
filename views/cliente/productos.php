@@ -1,4 +1,7 @@
-<!-- views/cliente/productos.php -->
+<?php
+require_once __DIR__ . '/includes/init.php';
+// views/cliente/productos.php
+?>
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
 

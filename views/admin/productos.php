@@ -1,9 +1,31 @@
+<?php
+require_once __DIR__ . '/../../models/producto.php';
+
+$productoModel = new Producto();
+$productos = $productoModel->obtenerTodosLosProductos();
+?>
 <!-- views/admin/productos.php -->
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
 
 <main class="main-wrapper">
     <div class="container-fluid px-4 px-lg-5">
+        <?php
+        $status = $_GET['status'] ?? null;
+        $mensajes = [
+            'creado' => ['type' => 'success', 'text' => 'El producto se añadió al catálogo.'],
+            'actualizado' => ['type' => 'success', 'text' => 'Los datos del producto se guardaron correctamente.'],
+            'eliminado' => ['type' => 'success', 'text' => 'El producto se eliminó del catálogo.'],
+            'no_encontrado' => ['type' => 'warning', 'text' => 'El producto solicitado no existe.'],
+            'error' => ['type' => 'danger', 'text' => 'No se pudo completar la operación solicitada.'],
+        ];
+
+        if ($status && isset($mensajes[$status])): ?>
+        <div class="alert alert-<?= $mensajes[$status]['type']; ?> alert-dismissible fade show" role="alert" data-auto-dismiss="true">
+            <?= htmlspecialchars($mensajes[$status]['text'], ENT_QUOTES, 'UTF-8'); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+        <?php endif; ?>
         <header class="page-header text-center text-lg-start">
             <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                 <div>
@@ -26,18 +48,24 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($productos as $producto): ?>
+                        <?php if (!empty($productos)): ?>
+                            <?php foreach ($productos as $producto): ?>
                             <tr>
-                                <td><?= $producto['id'] ?></td>
-                                <td><?= $producto['nombre'] ?></td>
-                                <td><?= $producto['descripcion'] ?></td>
-                                <td><?= '$' . number_format($producto['precio'], 2) ?></td>
+                                <td><?= (int) $producto['id']; ?></td>
+                                <td><?= htmlspecialchars($producto['nombre'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?= htmlspecialchars($producto['descripcion'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?= '$' . number_format((float) $producto['precio'], 2); ?></td>
                                 <td class="text-nowrap">
-                                    <a href="editar_producto.php?id=<?= $producto['id'] ?>" class="btn btn-warning btn-sm">Editar</a>
-                                    <a href="eliminar_producto.php?id=<?= $producto['id'] ?>" class="btn btn-danger btn-sm">Eliminar</a>
+                                    <a href="editar_producto.php?id=<?= (int) $producto['id']; ?>" class="btn btn-warning btn-sm">Editar</a>
+                                    <a href="<?= BASE_URL ?>/controllers/productos.php?accion=eliminar&amp;id=<?= (int) $producto['id']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
                                 </td>
                             </tr>
-                        <?php endforeach; ?>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">No hay productos registrados todavía.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

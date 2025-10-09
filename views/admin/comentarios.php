@@ -1,3 +1,9 @@
+<?php
+require_once __DIR__ . '/../../models/comentario.php';
+
+$comentarioModel = new Comentario();
+$comentarios = $comentarioModel->obtenerComentarios();
+?>
 <!-- views/admin/comentarios.php -->
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
@@ -20,16 +26,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($comentarios as $comentario): ?>
+                        <?php if (!empty($comentarios)): ?>
+                            <?php foreach ($comentarios as $comentario): ?>
                             <tr>
-                                <td><?= $comentario['producto'] ?></td>
-                                <td><?= $comentario['usuario'] ?></td>
-                                <td><?= $comentario['comentario'] ?></td>
+                                <td><?= htmlspecialchars($comentario['producto'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?= htmlspecialchars($comentario['usuario'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?= htmlspecialchars($comentario['comentario'], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td class="text-end text-nowrap">
-                                    <a href="eliminar_comentario.php?id=<?= $comentario['id'] ?>" class="btn btn-danger btn-sm">Eliminar</a>
+                                    <a href="eliminar_comentario.php?id=<?= (int) $comentario['id']; ?>" class="btn btn-danger btn-sm disabled" aria-disabled="true">Eliminar</a>
                                 </td>
                             </tr>
-                        <?php endforeach; ?>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">No hay comentarios registrados.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

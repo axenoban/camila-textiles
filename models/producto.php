@@ -9,7 +9,7 @@ class Producto {
     public function obtenerProductosVisibles() {
         global $pdo;
 
-        $stmt = $pdo->prepare("SELECT * FROM productos WHERE visible = 1");
+        $stmt = $pdo->prepare("SELECT p.*, COALESCE(i.cantidad, 0) AS stock FROM productos p LEFT JOIN inventarios i ON i.id_producto = p.id WHERE p.visible = 1");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

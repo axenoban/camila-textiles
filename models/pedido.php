@@ -10,7 +10,7 @@ class Pedido {
         global $pdo;
 
         $stmt = $pdo->prepare("SELECT p.*, pr.nombre AS producto, pr.precio FROM pedidos p INNER JOIN productos pr ON p.id_producto = pr.id WHERE p.id_usuario = :id_usuario ORDER BY p.fecha_creacion DESC");
-        $stmt->execute(['id_usuario' => $idUsuario]);
+        $stmt->execute(['id_usuario' => (int) $idUsuario]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -73,6 +73,18 @@ class Pedido {
 
         $stmt = $pdo->prepare("UPDATE pedidos SET estado = 'cancelado' WHERE id = :id");
         return $stmt->execute(['id' => $id]);
+    }
+
+    public function crearPedido($idUsuario, $idProducto, $cantidad) {
+        global $pdo;
+
+        $stmt = $pdo->prepare("INSERT INTO pedidos (id_usuario, id_producto, cantidad, estado) VALUES (:id_usuario, :id_producto, :cantidad, 'pendiente')");
+
+        return $stmt->execute([
+            'id_usuario' => (int) $idUsuario,
+            'id_producto' => (int) $idProducto,
+            'cantidad' => (int) $cantidad,
+        ]);
     }
 }
 ?>

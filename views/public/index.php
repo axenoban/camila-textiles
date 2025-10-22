@@ -9,13 +9,17 @@ $productos = $productoModel->obtenerProductosDestacados(6);
 <?php include('includes/navbar.php'); ?>
 
 <main class="main-content">
+    <!-- 🧭 Hero principal -->
     <section class="hero">
         <div class="container">
             <div class="row align-items-center gy-5">
                 <div class="col-lg-6">
                     <span class="badge-soft">Textiles premium importados</span>
                     <h1 class="hero-title mt-3">Gestión inteligente para una empresa textil en constante crecimiento</h1>
-                    <p class="hero-subtitle">Digitalizamos el inventario, los pedidos y la experiencia de compra de Camila Textil para conectar en tiempo real a los clientes con las telas que buscan.</p>
+                    <p class="hero-subtitle">
+                        Digitalizamos el inventario, los pedidos y la experiencia de compra de Camila Textil
+                        para conectar en tiempo real a los clientes con las telas que buscan.
+                    </p>
                     <div class="d-flex flex-wrap gap-3 mt-4">
                         <a class="btn btn-primary btn-lg rounded-pill px-4" href="<?= BASE_URL ?>/views/public/productos.php">Explorar catálogo</a>
                         <a class="btn btn-outline-primary rounded-pill px-4" href="<?= BASE_URL ?>/views/public/acerca.php">Conocer la empresa</a>
@@ -37,17 +41,23 @@ $productos = $productoModel->obtenerProductosDestacados(6);
                 </div>
                 <div class="col-lg-6">
                     <div class="hero-illustration">
-                        <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80" class="img-fluid rounded-4" alt="Rollos de tela">
+                        <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80"
+                             class="img-fluid rounded-4"
+                             alt="Rollos de tela">
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- 💡 Por qué Camila Textil -->
     <section class="section">
         <div class="container">
             <h2 class="section-title">¿Por qué Camila Textil?</h2>
-            <p class="section-lead">Automatizamos cada etapa de la venta de telas: desde el control de inventarios hasta la reserva en línea para diseñadores y mayoristas.</p>
+            <p class="section-lead">
+                Automatizamos cada etapa de la venta de telas: desde el control de inventarios hasta la reserva en línea
+                para diseñadores y mayoristas.
+            </p>
             <div class="row g-4 mt-4">
                 <div class="col-md-4">
                     <div class="feature-card">
@@ -74,6 +84,7 @@ $productos = $productoModel->obtenerProductosDestacados(6);
         </div>
     </section>
 
+    <!-- 🧵 Productos destacados -->
     <section class="section pt-0">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
@@ -83,29 +94,49 @@ $productos = $productoModel->obtenerProductosDestacados(6);
                 </div>
                 <a class="btn btn-outline-primary rounded-pill px-4 mt-3 mt-md-0" href="<?= BASE_URL ?>/views/public/productos.php">Ver todo el catálogo</a>
             </div>
+
             <div class="product-grid">
-                <?php foreach ($productos as $producto): ?>
-                    <article class="product-card">
-                        <img src="<?= $producto['imagen'] ?>" alt="<?= $producto['nombre'] ?>">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <h5 class="card-title mb-0"><?= $producto['nombre'] ?></h5>
-                                <span class="product-price">$<?= number_format($producto['precio'], 2) ?></span>
+                <?php if (!empty($productos)): ?>
+                    <?php foreach ($productos as $producto): ?>
+                        <article class="product-card">
+                            <img src="<?= htmlspecialchars($producto['imagen_principal'] ?? 'https://via.placeholder.com/300x220', ENT_QUOTES, 'UTF-8'); ?>"
+                                 alt="<?= htmlspecialchars($producto['nombre']); ?>">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="card-title mb-0"><?= htmlspecialchars($producto['nombre']); ?></h5>
+                                    <span class="product-price">
+                                        Bs <?= number_format($producto['precio_metro'] ?? 0, 2, ',', '.'); ?>
+                                    </span>
+                                </div>
+                                <p class="card-text mb-4">
+                                    <?= htmlspecialchars($producto['descripcion'] ?? 'Sin descripción.'); ?>
+                                </p>
+                                <a href="<?= BASE_URL ?>/views/public/productos.php" class="btn btn-primary w-100 rounded-pill">
+                                    Explorar más opciones
+                                </a>
                             </div>
-                            <p class="card-text mb-4"><?= $producto['descripcion'] ?></p>
-                            <a href="<?= BASE_URL ?>/views/public/productos.php" class="btn btn-primary w-100">Explorar más opciones</a>
-                        </div>
-                    </article>
-                <?php endforeach; ?>
+                        </article>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="text-center py-5">
+                        <div class="empty-icon"><i class="bi bi-emoji-frown"></i></div>
+                        <h5 class="fw-semibold">No hay productos destacados</h5>
+                        <p class="text-muted mb-0">Los productos visibles se mostrarán automáticamente aquí.</p>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </section>
 
+    <!-- ⚙️ Banner final -->
     <section class="section pt-0">
         <div class="container">
             <div class="feature-card text-center px-4 py-5">
                 <h3 class="fw-semibold mb-3">Integra todo el flujo de trabajo textil en un solo lugar</h3>
-                <p class="text-muted mb-4">El sistema web de Camila Textil conecta a los equipos de ventas, inventarios y atención al cliente para ofrecer respuestas inmediatas y una experiencia memorable.</p>
+                <p class="text-muted mb-4">
+                    El sistema web de Camila Textil conecta a los equipos de ventas, inventarios y atención al cliente
+                    para ofrecer respuestas inmediatas y una experiencia memorable.
+                </p>
                 <div class="d-flex justify-content-center gap-3 flex-wrap">
                     <span class="badge-soft">Reservas en línea</span>
                     <span class="badge-soft">Alertas inteligentes de stock</span>

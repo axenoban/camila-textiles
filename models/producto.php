@@ -1,235 +1,384 @@
 <?php
-// producto.php
-
+// models/producto.php
 require_once __DIR__ . '/../database/conexion.php';
 
-class Producto {
+class Producto
+{
+    /* =======================================================
+       📦 PRODUCTOS
+    ======================================================= */
 
-    // Método para obtener todos los productos visibles
-   public function obtenerProductosVisibles() {
-    global $pdo;
-    $sql = "
-        SELECT p.*, 
-               COALESCE(SUM(pi.stock), i.cantidad, 0) AS stock
-        FROM productos p
-        LEFT JOIN inventarios i ON p.id = i.id_producto
-        LEFT JOIN producto_existencias pi ON p.id = pi.id_producto
-        WHERE p.visible = 1
-        GROUP BY p.id
-        ORDER BY p.fecha_creacion DESC
-    ";
-    return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-}
-
-
-    // Método para obtener todos los productos sin filtro de visibilidad
-    public function obtenerTodosLosProductos() {
-        global $pdo;
-
-        $sql = "
-            SELECT
-                p.*,
-                COALESCE(variantes.stock_total, i.cantidad, 0) AS stock,
-                COALESCE(precios.precio_metro, precios.precio_desde, p.precio) AS precio_metro,
-                COALESCE(precios.precio_desde, p.precio) AS precio_desde,
-                COALESCE(colores.total_colores, 0) AS total_colores,
-                COALESCE(presentaciones.total_presentaciones, 0) AS total_presentaciones
-            FROM productos p
-            LEFT JOIN (
-                SELECT
-                    pe.id_producto,
-                    SUM(
-                        CASE
-                            WHEN pp.tipo = 'rollo' THEN pe.stock * COALESCE(pp.metros_por_unidad, 0)
-                            ELSE pe.stock
-                        END
-                    ) AS stock_total
-                FROM producto_existencias pe
-                INNER JOIN producto_presentaciones pp ON pe.id_presentacion = pp.id
-                GROUP BY pe.id_producto
-            ) AS variantes ON variantes.id_producto = p.id
-            LEFT JOIN inventarios i ON i.id_producto = p.id
-            LEFT JOIN (
-                SELECT
-                    id_producto,
-                    MIN(precio) AS precio_desde,
-                    MIN(
-                        CASE
-                            WHEN tipo = 'metro' THEN precio
-                            WHEN tipo = 'rollo' AND COALESCE(metros_por_unidad, 0) > 0 THEN precio / metros_por_unidad
-                            ELSE NULL
-                        END
-                    ) AS precio_metro
-                FROM producto_presentaciones
-                GROUP BY id_producto
-            ) AS precios ON precios.id_producto = p.id
-            LEFT JOIN (
-                SELECT id_producto, COUNT(*) AS total_colores FROM producto_colores GROUP BY id_producto
-            ) AS colores ON colores.id_producto = p.id
-            LEFT JOIN (
-                SELECT id_producto, COUNT(*) AS total_presentaciones FROM producto_presentaciones GROUP BY id_producto
-            ) AS presentaciones ON presentaciones.id_producto = p.id
-            ORDER BY p.fecha_creacion DESC
-        ";
-
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // Método para obtener productos recientes para destacar en portada
-    public function obtenerProductosDestacados($limite = 6) {
-        global $pdo;
-
-        $stmt = $pdo->prepare("SELECT * FROM productos WHERE visible = 1 ORDER BY fecha_creacion DESC LIMIT :limite");
-        $stmt->bindValue(':limite', (int) $limite, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // Método para contar los productos visibles en el catálogo
-    public function contarProductosVisibles() {
-        global $pdo;
-
-        return (int) $pdo->query("SELECT COUNT(*) FROM productos WHERE visible = 1")->fetchColumn();
-    }
-
-    // Método para obtener un producto por ID
-    public function obtenerProductoPorId($id) {
+    // Obtener productos visibles (para el catálogo público)
+    public function obtenerProductosVisibles()
+    {
         global $pdo;
 
         $sql = "
             SELECT 
-                p.*, 
-                COALESCE(variantes.stock_total, i.cantidad, 0) AS stock_total,
-                COALESCE(precios.precio_desde, p.precio) AS precio_desde
+                p.*,
+                COALESCE(SUM(pc.stock_metros + (pc.stock_rollos * p.metros_por_rollo)), 0) AS stock_total
             FROM productos p
-            LEFT JOIN (
-                SELECT 
-                    pe.id_producto,
-                    SUM(
-                        CASE 
-                            WHEN pp.tipo = 'rollo' THEN pe.stock * COALESCE(pp.metros_por_unidad, 0)
-                            ELSE pe.stock
-                        END
-                    ) AS stock_total
-                FROM producto_existencias pe
-                INNER JOIN producto_presentaciones pp ON pe.id_presentacion = pp.id
-                WHERE pe.id_producto = :id_producto
-                GROUP BY pe.id_producto
-            ) AS variantes ON variantes.id_producto = p.id
-            LEFT JOIN inventarios i ON i.id_producto = p.id
-            LEFT JOIN (
-                SELECT id_producto, MIN(precio) AS precio_desde FROM producto_presentaciones WHERE id_producto = :id_producto GROUP BY id_producto
-            ) AS precios ON precios.id_producto = p.id
-            WHERE p.id = :id_producto
-            LIMIT 1
+            LEFT JOIN producto_colores pc ON p.id = pc.id_producto
+            WHERE p.visible = 1
+            GROUP BY p.id
+            ORDER BY p.fecha_creacion DESC
+        ";
+        return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function obtenerTodosLosProductos()
+    {
+        global $pdo;
+
+        // Solo obtener productos activos
+        $sql = "
+        SELECT 
+            p.*,
+            COUNT(DISTINCT pc.id) AS total_colores,
+            COALESCE(SUM(pc.stock_metros + (pc.stock_rollos * p.metros_por_rollo)), 0) AS stock_total
+        FROM productos p
+        LEFT JOIN producto_colores pc ON p.id = pc.id_producto
+        WHERE p.estado = 'activo'  -- Solo productos activos
+        GROUP BY p.id
+        ORDER BY p.fecha_creacion DESC
+    ";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    // Contar productos visibles
+    public function contarProductosVisibles()
+    {
+        global $pdo;
+        return (int) $pdo->query("SELECT COUNT(*) FROM productos WHERE visible = 1")->fetchColumn();
+    }
+
+    // Obtener productos destacados (por fecha o visibilidad)
+    public function obtenerProductosDestacados($limite = 6)
+    {
+        global $pdo;
+
+        $stmt = $pdo->prepare("
+            SELECT * FROM productos
+            WHERE visible = 1
+            ORDER BY fecha_creacion DESC
+            LIMIT :limite
+        ");
+        $stmt->bindValue(':limite', (int)$limite, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Obtener un producto por ID
+    public function obtenerProductoPorId($id)
+    {
+        global $pdo;
+
+        $sql = "
+            SELECT 
+                p.*,
+                COALESCE(SUM(pc.stock_metros + (pc.stock_rollos * p.metros_por_rollo)), 0) AS stock_total
+            FROM productos p
+            LEFT JOIN producto_colores pc ON p.id = pc.id_producto
+            WHERE p.id = :id
+            GROUP BY p.id
         ";
 
         $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id_producto' => (int) $id]);
+        $stmt->execute(['id' => (int)$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function obtenerColoresPorProducto($idProducto) {
-        global $pdo;
+    /* =======================================================
+       🎨 COLORES Y VARIANTES
+    ======================================================= */
 
-        $stmt = $pdo->prepare("SELECT * FROM producto_colores WHERE id_producto = :id_producto ORDER BY nombre ASC");
-        $stmt->execute(['id_producto' => (int) $idProducto]);
+    // 🟣 Obtener todos los colores de un producto
+    public function obtenerColoresPorProducto($idProducto)
+    {
+        global $pdo;
+        $sql = "SELECT * FROM producto_colores WHERE id_producto = :id_producto ORDER BY id DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['id_producto' => $idProducto]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function obtenerPresentacionesPorProducto($idProducto) {
-        global $pdo;
-
-        $stmt = $pdo->prepare("SELECT * FROM producto_presentaciones WHERE id_producto = :id_producto ORDER BY FIELD(tipo, 'rollo', 'metro'), precio ASC");
-        $stmt->execute(['id_producto' => (int) $idProducto]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function obtenerExistenciasPorProducto($idProducto) {
-        global $pdo;
-
-        $stmt = $pdo->prepare("SELECT pe.*, pc.nombre AS color_nombre, pc.codigo_hex, pp.tipo, pp.metros_por_unidad FROM producto_existencias pe INNER JOIN producto_presentaciones pp ON pe.id_presentacion = pp.id INNER JOIN producto_colores pc ON pe.id_color = pc.id WHERE pe.id_producto = :id_producto");
-        $stmt->execute(['id_producto' => (int) $idProducto]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function obtenerColorPorId($idColor) {
+    // Obtener un color específico por ID
+    public function obtenerColorPorId($idColor)
+    {
         global $pdo;
 
         $stmt = $pdo->prepare("SELECT * FROM producto_colores WHERE id = :id");
-        $stmt->execute(['id' => (int) $idColor]);
+        $stmt->execute(['id' => (int)$idColor]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function obtenerPresentacionPorId($idPresentacion) {
+    // Obtener el stock total de un color (en metros y rollos)
+    public function obtenerStockColor($idColor)
+    {
         global $pdo;
 
-        $stmt = $pdo->prepare("SELECT * FROM producto_presentaciones WHERE id = :id");
-        $stmt->execute(['id' => (int) $idPresentacion]);
+        $stmt = $pdo->prepare("
+            SELECT stock_metros, stock_rollos 
+            FROM producto_colores 
+            WHERE id = :id
+        ");
+        $stmt->execute(['id' => (int)$idColor]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function obtenerStockVariante($idProducto, $idColor, $idPresentacion) {
+    // Disminuir stock tras un pedido (por tipo de unidad)
+    public function disminuirStockColor($idColor, $unidad, $cantidad)
+    {
         global $pdo;
 
-        $stmt = $pdo->prepare("SELECT stock FROM producto_existencias WHERE id_producto = :id_producto AND id_color = :id_color AND id_presentacion = :id_presentacion");
-        $stmt->execute([
-            'id_producto' => (int) $idProducto,
-            'id_color' => (int) $idColor,
-            'id_presentacion' => (int) $idPresentacion,
-        ]);
+        if ($unidad === 'metro') {
+            $sql = "UPDATE producto_colores 
+                    SET stock_metros = GREATEST(stock_metros - :cantidad, 0)
+                    WHERE id = :id_color";
+        } else {
+            $sql = "UPDATE producto_colores 
+                    SET stock_rollos = GREATEST(stock_rollos - :cantidad, 0)
+                    WHERE id = :id_color";
+        }
 
-        $stock = $stmt->fetchColumn();
-        return $stock !== false ? (float) $stock : 0.0;
+        $stmt = $pdo->prepare($sql);
+        return $stmt->execute([
+            'cantidad' => (float)$cantidad,
+            'id_color' => (int)$idColor
+        ]);
     }
 
-    public function disminuirStockVariante($idProducto, $idColor, $idPresentacion, $cantidad) {
+    /* =======================================================
+       🧱 CRUD BÁSICO DE PRODUCTOS (VERSIONES ANTIGUAS)
+    ======================================================= */
+
+    public function agregarProducto($nombre, $descripcion, $precioMetro, $precioRollo, $imagen, $tipoTela = null, $composicion = null)
+    {
         global $pdo;
 
-        $stmt = $pdo->prepare("UPDATE producto_existencias SET stock = GREATEST(stock - :cantidad, 0) WHERE id_producto = :id_producto AND id_color = :id_color AND id_presentacion = :id_presentacion");
+        $stmt = $pdo->prepare("
+            INSERT INTO productos 
+            (nombre, descripcion, precio_metro, precio_rollo, imagen_principal, tipo_tela, composicion) 
+            VALUES 
+            (:nombre, :descripcion, :precio_metro, :precio_rollo, :imagen, :tipo_tela, :composicion)
+        ");
 
         return $stmt->execute([
-            'cantidad' => (float) $cantidad,
-            'id_producto' => (int) $idProducto,
-            'id_color' => (int) $idColor,
-            'id_presentacion' => (int) $idPresentacion,
+            'nombre' => $nombre,
+            'descripcion' => $descripcion,
+            'precio_metro' => $precioMetro,
+            'precio_rollo' => $precioRollo,
+            'imagen' => $imagen,
+            'tipo_tela' => $tipoTela,
+            'composicion' => $composicion
         ]);
     }
 
-    // Método para agregar un nuevo producto
-    public function agregarProducto($nombre, $descripcion, $precio, $imagen) {
+    public function editarProducto($id, $nombre, $descripcion, $precioMetro, $precioRollo, $imagen, $tipoTela = null, $composicion = null)
+    {
         global $pdo;
 
-        $stmt = $pdo->prepare("INSERT INTO productos (nombre, descripcion, precio, imagen) VALUES (:nombre, :descripcion, :precio, :imagen)");
-        return $stmt->execute(['nombre' => $nombre, 'descripcion' => $descripcion, 'precio' => $precio, 'imagen' => $imagen]);
+        try {
+            // Iniciar la transacción
+            $pdo->beginTransaction();
+
+            $stmt = $pdo->prepare("
+                UPDATE productos 
+                SET nombre = :nombre,
+                    descripcion = :descripcion,
+                    precio_metro = :precio_metro,
+                    precio_rollo = :precio_rollo,
+                    imagen_principal = :imagen,
+                    tipo_tela = :tipo_tela,
+                    composicion = :composicion
+                WHERE id = :id
+            ");
+
+            $stmt->execute([
+                'id' => $id,
+                'nombre' => $nombre,
+                'descripcion' => $descripcion,
+                'precio_metro' => $precioMetro,
+                'precio_rollo' => $precioRollo,
+                'imagen' => $imagen,
+                'tipo_tela' => $tipoTela,
+                'composicion' => $composicion
+            ]);
+
+            // Si todo sale bien, commit
+            $pdo->commit();
+            return true;
+        } catch (Exception $e) {
+            // En caso de error, hacer rollback
+            $pdo->rollBack();
+            throw $e;
+        }
     }
 
-    // Método para editar un producto
-    public function editarProducto($id, $nombre, $descripcion, $precio, $imagen) {
+    // Modelo Producto.php
+
+    public function eliminarProducto($idProducto)
+    {
         global $pdo;
 
-        $stmt = $pdo->prepare("UPDATE productos SET nombre = :nombre, descripcion = :descripcion, precio = :precio, imagen = :imagen WHERE id = :id");
-        return $stmt->execute(['id' => $id, 'nombre' => $nombre, 'descripcion' => $descripcion, 'precio' => $precio, 'imagen' => $imagen]);
+        // Verificar si el producto tiene relaciones
+        if ($this->tieneRelaciones($idProducto)) {
+            // Cambiar el estado a 'inactivo' en lugar de eliminar
+            $sql = "UPDATE productos SET estado = 'inactivo', visible = 0 WHERE id = :id_producto";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute(['id_producto' => $idProducto]);
+            return true; // Producto desactivado correctamente
+        } else {
+            // Si no tiene relaciones, se puede eliminar
+            $sql = "DELETE FROM productos WHERE id = :id_producto";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute(['id_producto' => $idProducto]);
+            return true; // Producto eliminado correctamente
+        }
     }
 
-    // Método para eliminar un producto
-    public function eliminarProducto($id) {
+    // Método para verificar si el producto tiene relaciones en otras tablas
+    public function tieneRelaciones($idProducto)
+    {
         global $pdo;
 
-        $stmt = $pdo->prepare("DELETE FROM productos WHERE id = :id");
-        return $stmt->execute(['id' => $id]);
+        // Verificar en la tabla `producto_colores`
+        $sql = "SELECT COUNT(*) FROM producto_colores WHERE id_producto = :id_producto";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['id_producto' => $idProducto]);
+        $countColores = $stmt->fetchColumn();
+
+        // Verificar en la tabla `pedidos`
+        $sql = "SELECT COUNT(*) FROM pedidos WHERE id_producto = :id_producto";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['id_producto' => $idProducto]);
+        $countPedidos = $stmt->fetchColumn();
+
+        // Si hay registros en las tablas relacionadas, devolver true
+        return ($countColores > 0 || $countPedidos > 0);
     }
 
-    public function actualizarVisibilidad($idProducto, $visible) {
+
+
+
+
+
+    /* =======================================================
+       🧩 CRUD COMPLETO (NUEVAS VERSIONES - 2025)
+    ======================================================= */
+
+    public function crearProducto(array $data)
+    {
         global $pdo;
 
-        $stmt = $pdo->prepare('UPDATE productos SET visible = :visible WHERE id = :id');
+        $sql = "INSERT INTO productos (
+                    nombre, descripcion, ancho_metros, composicion, tipo_tela, gramaje, elasticidad,
+                    precio_metro, precio_rollo, metros_por_rollo, imagen_principal, visible
+                ) VALUES (
+                    :nombre, :descripcion, :ancho_metros, :composicion, :tipo_tela, :gramaje, :elasticidad,
+                    :precio_metro, :precio_rollo, :metros_por_rollo, :imagen_principal, :visible
+                )";
+
+        $stmt = $pdo->prepare($sql);
         return $stmt->execute([
-            'visible' => $visible ? 1 : 0,
-            'id' => (int) $idProducto,
+            'nombre'           => $data['nombre'],
+            'descripcion'      => $data['descripcion'],
+            'ancho_metros'     => $data['ancho_metros'],
+            'composicion'      => $data['composicion'],
+            'tipo_tela'        => $data['tipo_tela'],
+            'gramaje'          => $data['gramaje'],
+            'elasticidad'      => $data['elasticidad'],
+            'precio_metro'     => $data['precio_metro'],
+            'precio_rollo'     => $data['precio_rollo'],
+            'metros_por_rollo' => $data['metros_por_rollo'],
+            'imagen_principal' => $data['imagen_principal'],
+            'visible'          => $data['visible']
         ]);
+    }
+
+    public function actualizarProducto($id, array $data)
+    {
+        global $pdo;
+
+        $sql = "UPDATE productos SET 
+                nombre = :nombre,
+                descripcion = :descripcion,
+                ancho_metros = :ancho_metros,
+                composicion = :composicion,
+                tipo_tela = :tipo_tela,
+                gramaje = :gramaje,
+                elasticidad = :elasticidad,
+                precio_metro = :precio_metro,
+                precio_rollo = :precio_rollo,
+                metros_por_rollo = :metros_por_rollo,
+                imagen_principal = :imagen_principal,
+                visible = :visible
+            WHERE id = :id";
+
+        $stmt = $pdo->prepare($sql);
+        return $stmt->execute([
+            'id'               => $id,
+            'nombre'           => $data['nombre'],
+            'descripcion'      => $data['descripcion'],
+            'ancho_metros'     => $data['ancho_metros'],
+            'composicion'      => $data['composicion'],
+            'tipo_tela'        => $data['tipo_tela'],
+            'gramaje'          => $data['gramaje'],
+            'elasticidad'      => $data['elasticidad'],
+            'precio_metro'     => $data['precio_metro'],
+            'precio_rollo'     => $data['precio_rollo'],
+            'metros_por_rollo' => $data['metros_por_rollo'],
+            'imagen_principal' => $data['imagen_principal'],
+            'visible'          => $data['visible']
+        ]);
+    }
+
+    public function actualizarVisibilidad($id, $visible)
+    {
+        global $pdo;
+
+        $sql = "UPDATE productos SET visible = :visible WHERE id = :id";
+        $stmt = $pdo->prepare($sql);
+
+        // Verificar si la actualización fue exitosa
+        if ($stmt->execute([
+            'visible' => (int)$visible,
+            'id' => (int)$id
+        ])) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public function obtenerProductosPorEstado($estado)
+    {
+        global $pdo;
+
+        $sql = "
+        SELECT 
+            p.*,
+            COUNT(DISTINCT pc.id) AS total_colores,
+            COALESCE(SUM(pc.stock_metros + (pc.stock_rollos * p.metros_por_rollo)), 0) AS stock_total
+        FROM productos p
+        LEFT JOIN producto_colores pc ON p.id = pc.id_producto
+        WHERE p.estado = :estado
+        GROUP BY p.id
+        ORDER BY p.fecha_creacion DESC
+    ";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['estado' => $estado]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function actualizarEstadoProducto($id, $estado)
+    {
+        global $pdo;
+
+        $sql = "UPDATE productos SET estado = :estado WHERE id = :id";
+        $stmt = $pdo->prepare($sql);
+        return $stmt->execute(['estado' => $estado, 'id' => (int)$id]);
     }
 }
-?>

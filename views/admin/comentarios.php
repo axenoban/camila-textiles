@@ -1,51 +1,69 @@
 <?php
-require_once __DIR__ . '/../../models/comentario.php';
+require_once __DIR__ . '/../../database/conexion.php';
 
-$comentarioModel = new Comentario();
-$comentarios = $comentarioModel->obtenerComentarios();
+// Recuperar los comentarios desde la base de datos
+$stmt = $pdo->prepare("SELECT * FROM comentarios ORDER BY id DESC");
+$stmt->execute();
+$comentarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Eliminar comentario
+if (isset($_GET['eliminar'])) {
+    $id = (int)$_GET['eliminar'];
+    $stmt = $pdo->prepare("DELETE FROM comentarios WHERE id = :id");
+    $stmt->execute(['id' => $id]);
+    header("Location: comentarios.php");
+    exit;
+}
+
+// Marcar comentario como leído
+if (isset($_GET['leer'])) {
+    $id = (int)$_GET['leer'];
+    $stmt = $pdo->prepare("UPDATE comentarios SET estado = 'leído' WHERE id = :id");
+    $stmt->execute(['id' => $id]);
+    header("Location: comentarios.php");
+    exit;
+}
 ?>
-<!-- views/admin/comentarios.php -->
+
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
 
 <main class="main-wrapper">
-    <div class="container-fluid px-4 px-lg-5">
-        <header class="page-header text-center text-lg-start">
-            <h1 class="page-title">Comentarios de clientes</h1>
-            <p class="page-subtitle">Analiza la retroalimentación recibida y modera las reseñas asociadas a cada producto.</p>
-        </header>
-        <div class="table-shell">
-            <div class="table-responsive">
-                <table class="table table-modern align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Cliente</th>
-                            <th>Comentario</th>
-                            <th class="text-end">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (!empty($comentarios)): ?>
-                            <?php foreach ($comentarios as $comentario): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($comentario['producto'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?= htmlspecialchars($comentario['usuario'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?= htmlspecialchars($comentario['comentario'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td class="text-end text-nowrap">
-                                    <a href="eliminar_comentario.php?id=<?= (int) $comentario['id']; ?>" class="btn btn-danger btn-sm disabled" aria-disabled="true">Eliminar</a>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="text-center text-muted py-4">No hay comentarios registrados.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <div class="container-fluid px-4">
+        <h1 class="page-title">Comentarios</h1>
+        <p class="text-muted">Aquí puedes gestionar los comentarios enviados desde el formulario de contacto.</p>
+
+        <table class="table table-modern">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Mensaje</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($comentarios as $comentario): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($comentario['nombre']); ?></td>
+                        <td><?= htmlspecialchars($comentario['email']); ?></td>
+                        <td><?= htmlspecialchars($comentario['mensaje']); ?></td>
+                        <td>
+                            <span class="status-pill <?= $comentario['estado'] == 'leído' ? 'status-confirmado' : 'status-pendiente'; ?>">
+                                <?= ucfirst($comentario['estado']); ?>
+                            </span>
+                        </td>
+                        <td>
+                            <?php if ($comentario['estado'] == 'sin leer'): ?>
+                                <a href="comentarios.php?leer=<?= $comentario['id']; ?>" class="btn btn-success btn-sm">Marcar como leído</a>
+                            <?php endif; ?>
+                            <a href="comentarios.php?eliminar=<?= $comentario['id']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
     </div>
 </main>
 

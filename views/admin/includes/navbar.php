@@ -13,11 +13,13 @@
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
                     <li class="nav-item"><a class="nav-link" href="dashboard.php"><i class="bi bi-speedometer me-2"></i>Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="productos.php"><i class="bi bi-box-seam me-2"></i>Productos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="inventario.php"><i class="bi bi-clipboard-data me-2"></i>Inventario</a></li>
                     <li class="nav-item"><a class="nav-link" href="pedidos.php"><i class="bi bi-bag-check me-2"></i>Pedidos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="clientes.php"><i class="bi bi-person-circle me-2"></i>Clientes</a></li>
                     <li class="nav-item"><a class="nav-link" href="empleados.php"><i class="bi bi-people me-2"></i>Empleados</a></li>
                     <li class="nav-item"><a class="nav-link" href="sucursales.php"><i class="bi bi-geo-alt me-2"></i>Sucursales</a></li>
                     <li class="nav-item"><a class="nav-link" href="reportes.php"><i class="bi bi-bar-chart-line me-2"></i>Reportes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="comentarios.php"><i class="bi bi-chat-dots me-2"></i>Comentarios</a></li>
+
                 </ul>
                 <div class="ms-lg-4 mt-3 mt-lg-0 d-flex align-items-center gap-3">
                     <span class="badge-user"><i class="bi bi-person-circle me-2"></i><?= htmlspecialchars($_SESSION['usuario']['nombre'] ?? 'Administrador', ENT_QUOTES, 'UTF-8'); ?></span>

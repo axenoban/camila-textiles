@@ -1,53 +1,97 @@
 <?php
-require_once __DIR__ . '/../config/app.php';      // ✅ AÑADIDO
-require_once __DIR__ . '/../database/conexion.php';
-session_start();
+require_once __DIR__ . '/../config/app.php';
+require_once __DIR__ . '/../models/pedido.php';
+require_once __DIR__ . '/../models/producto.php';
 
-if (empty($_SESSION['usuario']) || $_SESSION['usuario']['rol'] !== 'cliente') {
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Verificar login cliente
+if (empty($_SESSION['usuario']) || ($_SESSION['usuario']['rol'] ?? '') !== 'cliente') {
     header('Location: ' . BASE_URL . '/views/public/login.php');
     exit;
 }
 
-$idUsuario = $_SESSION['usuario']['id'] ?? 0;
-$idProducto = (int) ($_POST['producto_id'] ?? 0);
-$idColor = !empty($_POST['color_id']) ? (int) $_POST['color_id'] : null;
-$idPresentacion = !empty($_POST['presentacion_id']) ? (int) $_POST['presentacion_id'] : null;
-$cantidad = (float) ($_POST['cantidad'] ?? 0);
+$pedidoModel = new Pedido();
+$productoModel = new Producto();
 
-if ($idUsuario && $idProducto && $cantidad > 0) {
-    try {
-        // Obtener precio unitario de la presentación seleccionada
-        $stmt = $pdo->prepare("SELECT precio FROM producto_presentaciones WHERE id = :id_presentacion");
-        $stmt->execute(['id_presentacion' => $idPresentacion]);
-        $precioUnitario = (float) ($stmt->fetchColumn() ?: 0);
-        $total = $precioUnitario * $cantidad;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $idUsuario = (int)$_SESSION['usuario']['id'];
+    $idProducto = filter_input(INPUT_POST, 'id_producto', FILTER_VALIDATE_INT);
 
-        $insert = $pdo->prepare("
-            INSERT INTO pedidos 
-            (id_usuario, id_producto, id_color, id_presentacion, cantidad, unidad, precio_unitario, total, estado) 
-            VALUES 
-            (:usuario, :producto, :color, :presentacion, :cantidad, 'metro', :precio, :total, 'pendiente')
-        ");
-        $insert->execute([
-            'usuario' => $idUsuario,
-            'producto' => $idProducto,
-            'color' => $idColor,
-            'presentacion' => $idPresentacion,
-            'cantidad' => $cantidad,
-            'precio' => $precioUnitario,
-            'total' => $total
+    // Normalizar colores seleccionados
+    $coloresSeleccionados = $_POST['id_color'] ?? [];
+    if (!is_array($coloresSeleccionados)) {
+        $coloresSeleccionados = [$coloresSeleccionados];
+    }
+
+    $unidad   = $_POST['unidad'] ?? '';
+    $cantidad = (float)($_POST['cantidad'] ?? 0);
+
+    // Validación básica
+    if (!$idProducto || empty($coloresSeleccionados) || $cantidad <= 0 || !in_array($unidad, ['metro', 'rollo'], true)) {
+        $_SESSION['reserva_mensaje'] = '⚠️ Debes seleccionar al menos un color y una cantidad válida.';
+        header('Location: ' . BASE_URL . '/views/cliente/detalle_producto_cliente.php?id=' . (int)$idProducto);
+        exit;
+    }
+
+    // Obtener producto
+    $producto = $productoModel->obtenerProductoPorId($idProducto);
+    if (!$producto) {
+        $_SESSION['reserva_mensaje'] = 'El producto seleccionado no existe.';
+        header('Location: ' . BASE_URL . '/views/cliente/productos.php');
+        exit;
+    }
+
+    // Parametrización de precios
+    $precioMetro        = (float)$producto['precio_metro'];
+    $precioRollo        = (float)$producto['precio_rollo'];
+    $metrosPorRollo     = max(1.0, (float)$producto['metros_por_rollo']); // evitar división por cero
+    $precioRolloReal    = $precioRollo * $metrosPorRollo;  // ✅ precio por rollo real
+    $precioUnitarioBase = ($unidad === 'metro') ? $precioMetro : $precioRolloReal;
+
+    // Validar colores y crear 1 fila por color
+    $insertados = 0;
+
+    foreach ($coloresSeleccionados as $idColor) {
+        $idColor = (int)$idColor;
+        if ($idColor <= 0) { continue; }
+
+        // Verificar color existe y pertenece al producto
+        $color = $pedidoModel->obtenerColorPorId($idColor);
+        if (!$color || (int)$color['id_producto'] !== (int)$idProducto) {
+            $_SESSION['reserva_mensaje'] = '⚠️ Uno de los colores seleccionados no existe o no corresponde a este producto.';
+            header('Location: ' . BASE_URL . '/views/cliente/detalle_producto_cliente.php?id=' . (int)$idProducto);
+            exit;
+        }
+
+        if (($color['estado'] ?? 'disponible') !== 'disponible') {
+            $_SESSION['reserva_mensaje'] = '⚠️ El color seleccionado no está disponible en stock.';
+            header('Location: ' . BASE_URL . '/views/cliente/detalle_producto_cliente.php?id=' . (int)$idProducto);
+            exit;
+        }
+
+        // Calcular precio unitario / total por color
+        $precioUnitario = $precioUnitarioBase;                // metro: precio_metro | rollo: precio_rollo * metros_por_rollo
+        $total          = $precioUnitario * $cantidad;
+
+        // Insertar fila en pedidos (1 por color)
+        $pedidoModel->crearPedido([
+            'id_usuario'      => $idUsuario,
+            'id_producto'     => $idProducto,
+            'id_color'        => $idColor,
+            'unidad'          => $unidad,
+            'cantidad'        => $cantidad,
+            'precio_unitario' => $precioUnitario,
+            'total'           => $total
         ]);
 
-        $_SESSION['reserva_mensaje'] = "Tu reserva fue registrada correctamente.";
-        $_SESSION['reserva_tipo'] = 'success';
-
-    } catch (PDOException $e) {
-        error_log("Error al registrar pedido: " . $e->getMessage());
-        $_SESSION['reserva_mensaje'] = "Error al registrar tu pedido. Intenta nuevamente.";
-        $_SESSION['reserva_tipo'] = 'danger';
+        $insertados++;
     }
-}
 
-// ✅ Redirección segura de regreso al detalle del producto
-header('Location: ' . BASE_URL . '/views/cliente/detalle_producto_cliente.php?id=' . $idProducto);
-exit;
+    // Mensaje de éxito
+    $_SESSION['reserva_mensaje'] = "✅ Pedido registrado correctamente para {$insertados} color" . ($insertados > 1 ? 'es' : '') . '.';
+    header('Location: ' . BASE_URL . '/views/cliente/detalle_producto_cliente.php?id=' . (int)$idProducto);
+    exit;
+}

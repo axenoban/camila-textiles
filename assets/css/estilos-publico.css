@@ -620,3 +620,33 @@ textarea.form-control:focus {
         grid-template-columns: 1fr 1fr;
     }
 }
+/* === EXTENSIONES DE CATÁLOGO PÚBLICO === */
+.product-card {
+    transition: all 0.25s ease-in-out;
+    border-radius: 0.75rem;
+    background: var(--surface);
+}
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-card);
+}
+.badge {
+    font-size: 0.75rem;
+    padding: 0.5em 0.75em;
+}
+.bg-purple {
+    background-color: #6f42c1 !important;
+    color: #fff;
+}
+.btn-gradient {
+    background: linear-gradient(90deg, var(--primary), #3b82f6);
+    border: none;
+    color: #fff;
+}
+.btn-gradient:hover {
+    background: linear-gradient(90deg, var(--primary-dark), #1d4ed8);
+}
+.filtro.active {
+    background: var(--primary);
+    color: #fff;
+}

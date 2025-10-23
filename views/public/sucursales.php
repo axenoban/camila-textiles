@@ -1,4 +1,13 @@
-<!-- views/public/sucursales.php -->
+<?php
+require_once __DIR__ . '/../../models/sucursal.php';
+
+// Crear una instancia del modelo de sucursal
+$sucursalModel = new Sucursal();
+
+// Obtener solo las sucursales que estén visibles
+$sucursales = $sucursalModel->obtenerSucursalesVisibles();
+?>
+
 <?php include('includes/header.php'); ?>
 <?php include('includes/navbar.php'); ?>
 
@@ -14,30 +23,59 @@
                     <span class="badge-soft">Atención personalizada y retiro inmediato</span>
                 </div>
             </div>
+
             <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="branch-card">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5>Sucursal Santa Cruz 1</h5>
-                            <span class="badge-soft">Central</span>
+                <?php if (!empty($sucursales)): ?>
+                    <?php foreach ($sucursales as $sucursal): ?>
+                        <div class="col-md-6">
+                            <div class="branch-card">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5><?= htmlspecialchars($sucursal['nombre']); ?></h5>
+                                    <span class="badge-soft"><?= htmlspecialchars($sucursal['visible'] ? 'Central' : 'Logística'); ?></span>
+                                </div>
+                                <p class="text-muted mb-1"><i class="bi bi-geo-alt text-primary me-2"></i><?= htmlspecialchars($sucursal['direccion']); ?></p>
+                                <p class="text-muted mb-1"><i class="bi bi-telephone text-primary me-2"></i><?= htmlspecialchars($sucursal['telefono']); ?></p>
+                                <p class="text-muted mb-0"><i class="bi bi-clock text-primary me-2"></i><?= htmlspecialchars($sucursal['horario_apertura']); ?></p>
+
+                                <!-- Mostrar el mapa de la sucursal -->
+                                <?php if ($sucursal['latitud'] && $sucursal['longitud']): ?>
+                                    <div class="mt-3">
+                                        <div id="map-<?= $sucursal['id']; ?>" style="height: 200px; width: 100%;"></div>
+                                    </div>
+                                    <script>
+                                        // Inicializar el mapa para cada sucursal usando Leaflet
+                                        function initMap<?= $sucursal['id']; ?>() {
+                                            const location = { lat: <?= $sucursal['latitud']; ?>, lng: <?= $sucursal['longitud']; ?> };
+
+                                            const map = L.map('map-<?= $sucursal['id']; ?>').setView([location.lat, location.lng], 12);
+
+                                            // Capa de OpenStreetMap
+                                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                            }).addTo(map);
+
+                                            // Crear un marcador en la ubicación
+                                            L.marker([location.lat, location.lng]).addTo(map)
+                                                .bindPopup("<?= htmlspecialchars($sucursal['nombre']); ?>")
+                                                .openPopup();
+                                        }
+
+                                        // Llamar a la función para inicializar el mapa
+                                        document.addEventListener('DOMContentLoaded', function () {
+                                            initMap<?= $sucursal['id']; ?>();
+                                        });
+                                    </script>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                        <p class="text-muted mb-1"><i class="bi bi-geo-alt text-primary me-2"></i>Av. Las Américas 123, Santa Cruz</p>
-                        <p class="text-muted mb-1"><i class="bi bi-telephone text-primary me-2"></i>591-343-4567</p>
-                        <p class="text-muted mb-0"><i class="bi bi-clock text-primary me-2"></i>Lunes a viernes: 9:00 - 18:00</p>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="col-12">
+                        <p class="text-muted text-center">No hay sucursales disponibles actualmente.</p>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="branch-card">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5>Sucursal Santa Cruz 2</h5>
-                            <span class="badge-soft">Logística</span>
-                        </div>
-                        <p class="text-muted mb-1"><i class="bi bi-geo-alt text-primary me-2"></i>Calle 21 de Mayo, Santa Cruz</p>
-                        <p class="text-muted mb-1"><i class="bi bi-telephone text-primary me-2"></i>591-343-7890</p>
-                        <p class="text-muted mb-0"><i class="bi bi-clock text-primary me-2"></i>Lunes a viernes: 10:00 - 17:00</p>
-                    </div>
-                </div>
+                <?php endif; ?>
             </div>
+
             <div class="feature-card mt-5">
                 <div class="row align-items-center g-4">
                     <div class="col-md-8">
@@ -54,3 +92,6 @@
 </main>
 
 <?php include('includes/footer.php'); ?>
+
+<!-- Cargar Leaflet y el script de OpenStreetMap -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>

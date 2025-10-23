@@ -392,3 +392,31 @@ body.admin-layout {
         padding: 22px;
     }
 }
+/* Estilos para los comentarios */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-pendiente {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--admin-warning);
+}
+
+.status-confirmado {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--admin-success);
+}
+
+.table-modern td {
+    vertical-align: middle;
+}
+
+.table-modern td a {
+    margin-right: 10px;
+}

@@ -1,19 +1,19 @@
 <?php
 require_once __DIR__ . '/../database/conexion.php';
 
-class Usuario {
-
-    // ✅ Método corregido para autenticar un usuario
-    public function autenticarUsuario($identificador, $clave) {
+class Usuario
+{
+    public function autenticarUsuario($identificador, $clave)
+    {
         global $pdo;
 
         try {
             // Buscar por email o nombre
             $stmt = $pdo->prepare("
-                SELECT * FROM usuarios 
-                WHERE email = :identificador OR nombre = :identificador 
-                LIMIT 1
-            ");
+            SELECT * FROM usuarios 
+            WHERE email = :identificador OR nombre = :identificador 
+            LIMIT 1
+        ");
             $stmt->execute(['identificador' => $identificador]);
             $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -22,9 +22,14 @@ class Usuario {
                 return false;
             }
 
+            // Verificar si la cuenta está bloqueada
+            if ($usuario['estado'] !== 'habilitado') {
+                return 'Cuenta bloqueada, contáctese con la administración.'; // Mensaje de cuenta bloqueada
+            }
+
             // Si la contraseña está hasheada correctamente (BCRYPT, ARGON, etc.)
             if (password_verify($clave, $usuario['clave'])) {
-                return $usuario;
+                return $usuario; // Devuelve el array de usuario
             }
 
             // ⚠️ En caso de contraseñas antiguas sin hash (texto plano)
@@ -34,26 +39,28 @@ class Usuario {
                 $update = $pdo->prepare("UPDATE usuarios SET clave = :clave WHERE id = :id");
                 $update->execute(['clave' => $nuevoHash, 'id' => $usuario['id']]);
                 $usuario['clave'] = $nuevoHash;
-                return $usuario;
+                return $usuario; // Devuelve el array de usuario
             }
 
-            // Si no coincide ninguna validación
-            return false;
-
+            return false; // Si las contraseñas no coinciden
         } catch (PDOException $e) {
             error_log("Error al autenticar usuario: " . $e->getMessage());
-            return false;
+            return false; // Error de autenticación
         }
     }
 
+
+
     // ✅ Contar clientes activos
-    public function contarClientesActivos() {
+    public function contarClientesActivos()
+    {
         global $pdo;
         return (int)$pdo->query("SELECT COUNT(*) FROM usuarios WHERE rol = 'cliente'")->fetchColumn();
     }
 
     // ✅ Obtener todos los usuarios
-    public function obtenerUsuarios() {
+    public function obtenerUsuarios()
+    {
         global $pdo;
         $stmt = $pdo->prepare("SELECT * FROM usuarios");
         $stmt->execute();
@@ -61,7 +68,8 @@ class Usuario {
     }
 
     // ✅ Obtener usuario por ID
-    public function obtenerUsuarioPorId($id) {
+    public function obtenerUsuarioPorId($id)
+    {
         global $pdo;
         $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = :id");
         $stmt->execute(['id' => $id]);
@@ -69,7 +77,8 @@ class Usuario {
     }
 
     // ✅ Actualizar perfil
-    public function actualizarPerfil($id, $nombre, $email, $clave = null) {
+    public function actualizarPerfil($id, $nombre, $email, $clave = null)
+    {
         global $pdo;
 
         $campos = ['nombre' => $nombre, 'email' => $email, 'id' => $id];
@@ -86,7 +95,8 @@ class Usuario {
     }
 
     // ✅ Crear nuevo usuario
-    public function crearUsuario($nombre, $email, $clave, $rol = 'cliente') {
+    public function crearUsuario($nombre, $email, $clave, $rol = 'cliente')
+    {
         global $pdo;
 
         $claveHash = password_hash($clave, PASSWORD_DEFAULT);
@@ -102,4 +112,3 @@ class Usuario {
         ]);
     }
 }
-?>

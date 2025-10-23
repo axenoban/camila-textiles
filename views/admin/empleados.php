@@ -3,6 +3,21 @@ require_once __DIR__ . '/../../models/empleado.php';
 
 $empleadoModel = new Empleado();
 $empleados = $empleadoModel->obtenerEmpleados();
+
+// Lógica para eliminar un empleado
+if (isset($_GET['accion']) && $_GET['accion'] === 'eliminar' && isset($_GET['id'])) {
+    $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+    if ($id) {
+        $eliminado = $empleadoModel->eliminarEmpleado($id);
+        if ($eliminado) {
+            header('Location: empleados.php?status=eliminado');
+            exit;
+        } else {
+            header('Location: empleados.php?status=error');
+            exit;
+        }
+    }
+}
 ?>
 <!-- views/admin/empleados.php -->
 <?php include('includes/header.php'); ?>
@@ -57,7 +72,8 @@ $empleados = $empleadoModel->obtenerEmpleados();
                                 <td><?= '$' . number_format((float) $empleado['salario'], 2); ?></td>
                                 <td class="text-end text-nowrap">
                                     <a href="editar_empleado.php?id=<?= (int) $empleado['id']; ?>" class="btn btn-warning btn-sm">Editar</a>
-                                    <a href="eliminar_empleado.php?id=<?= (int) $empleado['id']; ?>" class="btn btn-danger btn-sm">Eliminar</a>
+                                    <!-- Enlace para eliminar empleado -->
+                                    <a href="empleados.php?accion=eliminar&id=<?= (int) $empleado['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este empleado?');">Eliminar</a>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
